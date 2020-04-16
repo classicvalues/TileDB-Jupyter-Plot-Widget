@@ -9,7 +9,7 @@ if "%SPHINXBUILD%" == "" (
 )
 set SOURCEDIR=source
 set BUILDDIR=build
-set SPHINXPROJ=tiledb_plot_widget
+set SPHINXPROJ=tiledb-plot-widget
 
 if "%1" == "" goto help
 

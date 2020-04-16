@@ -11,24 +11,22 @@ from os.path import join as pjoin
 
 from setupbase import (
     create_cmdclass, install_npm, ensure_targets,
-    find_packages, combine_commands, ensure_python,
-    get_version, HERE
+    combine_commands, ensure_python, find_packages,
+    HERE
 )
 
+import setuptools
 from setuptools import setup
 
 
 # The name of the project
-name = 'tiledb_plot_widget'
+name = 'tiledb-plot-widget'
 
 # Ensure a valid python version
 ensure_python('>=3.4')
 
-# Get our version
-version = get_version(pjoin(name, '_version.py'))
-
-nb_path = pjoin(HERE, name, 'nbextension', 'static')
-lab_path = pjoin(HERE, name, 'labextension')
+nb_path = pjoin(HERE, "tiledb/plot/widget", 'nbextension', 'static')
+lab_path = pjoin(HERE, "tiledb/plot/widget", 'labextension')
 
 # Representative files that should exist after a successful build
 jstargets = [
@@ -44,10 +42,10 @@ package_data_spec = {
 }
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/tiledb_plot_widget',
+    ('share/jupyter/nbextensions/tiledb-plot-widget',
         nb_path, '*.js*'),
     ('share/jupyter/lab/extensions', lab_path, '*.tgz'),
-    ('etc/jupyter/nbconfig/notebook.d' , HERE, 'tiledb_plot_widget.json')
+    ('etc/jupyter/nbconfig/notebook.d' , HERE, 'tiledb-plot-widget.json')
 ]
 
 
@@ -58,17 +56,19 @@ cmdclass['jsdeps'] = combine_commands(
     ensure_targets(jstargets),
 )
 
+packages = ["tiledb.plot.widget"] + [
+    "tiledb.plot.widget." + x for x in find_packages("./tiledb/plot/widget")
+]
 
 setup_args = dict(
     name            = name,
     description     = 'Custom Jupyterlab widget for TileDB',
-    version         = version,
     scripts         = glob(pjoin('scripts', '*')),
     cmdclass        = cmdclass,
-    packages        = find_packages(),
+    packages        = packages,
     author          = 'Konstantinos Sarantopoulos',
-    author_email    = 'kostas@tiledb.com',
-    url             = 'https://github.com/@tiledb/tiledb_plot_widget',
+    author_email    = 'hello@tiledb.com',
+    url             = 'https://github.com/TileDB-Inc/TileDB-Jupyter-Plot-Widget ',
     license         = 'BSD',
     platforms       = "Linux, Mac OS X, Windows",
     keywords        = ['Jupyter', 'Widgets', 'IPython'],
@@ -85,8 +85,16 @@ setup_args = dict(
         'Framework :: Jupyter',
     ],
     include_package_data = True,
+    zip_safe=False,  # Force folder install; egg doesn't work for namespace
+    use_scm_version={
+        "version_scheme": "guess-next-dev",
+        "local_scheme": "dirty-tag",
+        "write_to": "tiledb/plot/widget/version.py",
+    },
     install_requires = [
         'ipywidgets>=7.0.0',
+        "setuptools>=18.0",
+        "setuptools_scm>=1.5.4",
     ],
     extras_require = {
         'test': [

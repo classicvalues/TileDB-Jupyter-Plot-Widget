@@ -19,7 +19,7 @@ import {
   MODULE_NAME, MODULE_VERSION
 } from './version';
 
-const EXTENSION_ID = 'tiledb_plot_widget:plugin';
+const EXTENSION_ID = 'tiledb-plot-widget:plugin';
 
 /**
  * The example plugin.

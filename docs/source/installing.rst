@@ -5,27 +5,23 @@ Installation
 ============
 
 
-The simplest way to install tiledb_plot_widget is via pip::
+The simplest way to install tiledb.plot.widget is via pip::
 
-    pip install tiledb_plot_widget
-
-or via conda::
-
-    conda install tiledb_plot_widget
+    pip install tiledb-plot-widget
 
 
 If you installed via pip, and notebook version < 5.3, you will also have to
 install / configure the front-end extension as well. If you are using classic
 notebook (as opposed to Jupyterlab), run::
 
-    jupyter nbextension install [--sys-prefix / --user / --system] --py tiledb_plot_widget
+    jupyter nbextension install [--sys-prefix / --user / --system] --py tiledb-plot-widget
 
-    jupyter nbextension enable [--sys-prefix / --user / --system] --py tiledb_plot_widget
+    jupyter nbextension enable [--sys-prefix / --user / --system] --py tiledb-plot-widget
 
 with the `appropriate flag`_. If you are using Jupyterlab, install the extension
 with::
 
-    jupyter labextension install tiledb_plot_widget
+    jupyter labextension install tiledb-plot-widget
 
 If you are installing using conda, these commands should be unnecessary, but If
 you need to run them the commands should be the same (just make sure you choose the
