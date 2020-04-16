@@ -1,0 +1,2 @@
+[run]
+omit = tiledb_plot_widget/tests/*
