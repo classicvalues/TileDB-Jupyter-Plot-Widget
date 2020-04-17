@@ -153,30 +153,42 @@ class DagVisualizeView extends DOMWidgetView {
     });
 
     svg.call(zoom).on('wheel.zoom', null);
+
     function zoomHandler(this: any) {
       d3.event.preventDefault();
       const direction = (this.id === 'zoom_in') ? .2 : -.2;
 
       svg.transition().duration(300).call(zoom.scaleBy as any, 1 + direction);
     }
+
+    function resetHandler(this: any) {
+      svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+    }
+
     setTimeout(() => {
       d3.selectAll('.zoomControl').on('click', zoomHandler);
+      d3.selectAll('.resetControl').on('click', resetHandler);
     }, 0)
   }
+
 
 
   createControls() {
     const zoomInButton = document.createElement('button');
     const zoomOutButton = document.createElement('button');
+    const resetButton = document.createElement('button');
     const className = 'zoomControl';
     zoomInButton.id = 'zoom_in';
     zoomOutButton.id = 'zoom_out';
+    resetButton.className = 'resetControl';
     zoomInButton.className = className;
     zoomOutButton.className = className;
     zoomInButton.textContent = '+';
     zoomOutButton.textContent = '-';
+    resetButton.textContent = 'Reset';
 
     this.el.append(zoomInButton);
     this.el.append(zoomOutButton);
+    this.el.append(resetButton);
   }
 }

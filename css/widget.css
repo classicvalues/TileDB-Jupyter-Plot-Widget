@@ -101,11 +101,15 @@ svg{
   width: 65px;
 }
 
-.tiledb-widget .zoomControl {
+.tiledb-widget .zoomControl, .resetControl {
   left: 0;
   position: absolute;
   top: 0;
   z-index: 1;
+}
+
+.resetControl {
+  left: 58px;
 }
 
 #zoom_out {
