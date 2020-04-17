@@ -183,9 +183,6 @@ class DagVisualizeView extends DOMWidgetView {
     resetButton.className = 'resetControl';
     zoomInButton.className = className;
     zoomOutButton.className = className;
-    zoomInButton.textContent = '+';
-    zoomOutButton.textContent = '-';
-    resetButton.textContent = 'Reset';
 
     this.el.append(zoomInButton);
     this.el.append(zoomOutButton);

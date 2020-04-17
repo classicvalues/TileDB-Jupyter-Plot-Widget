@@ -25,7 +25,10 @@
   --kashmir: #446690;
   --success: #0075ff;
 
-  /* height: 400px; */
+  --jp-image-zoomin: url('../icons/zoomin.svg');
+  --jp-image-zoomout: url('../icons/zoomout.svg');
+  --jp-image-zoomreset: url('../icons/zoomreset.svg');
+
   position: relative;
   width: 100%;
 }
@@ -106,14 +109,28 @@ svg{
   position: absolute;
   top: 0;
   z-index: 1;
+  background-color: var(--kashmir);
+  background-image: var(--jp-image-zoomin);
+  border: 0;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: 0 0 3px rgba(0,0,0,.6);
+  background-size: 15px;
 }
 
 .resetControl {
-  left: 58px;
+  left: 80px;
+  background-image: var(--jp-image-zoomreset);
+  background-size: 14px;
 }
 
 #zoom_out {
-  left: 30px;
+  left: 40px;
+  background-image: var(--jp-image-zoomout);
+  background-size: 14px;
 }
 
 @keyframes dash {
