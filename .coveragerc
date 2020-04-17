@@ -1,2 +1,2 @@
 [run]
-omit = tiledb_plot_widget/tests/*
+omit = tiledb/plot/widget/tests/*

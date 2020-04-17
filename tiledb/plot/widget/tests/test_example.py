@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# Copyright (c) Konstantinos Sarantopoulos.
-# Distributed under the terms of the Modified BSD License.
+# Copyright (c) TileDB, Inc.
+# Distributed under the terms of the MIT License.
 
 import pytest
 

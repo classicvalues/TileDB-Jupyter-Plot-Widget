@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = tiledb_plot_widget
+SPHINXPROJ    = tiledb-plot-widget
 SOURCEDIR     = source
 BUILDDIR      = build
 

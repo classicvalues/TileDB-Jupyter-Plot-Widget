@@ -1,9 +1,4 @@
-
-# tiledb_plot_widget
-
-[![Build Status](https://travis-ci.org/@tiledb/tiledb_plot_widget.svg?branch=master)](https://travis-ci.org/@tiledb/tiledb_plot_widget)
-[![codecov](https://codecov.io/gh/@tiledb/tiledb_plot_widget/branch/master/graph/badge.svg)](https://codecov.io/gh/@tiledb/tiledb_plot_widget)
-
+# TileDB Jupyterlab Plot Widget
 
 Custom Jupyterlab widget for TileDB
 
@@ -12,18 +7,19 @@ Custom Jupyterlab widget for TileDB
 You can install using `pip`:
 
 ```bash
-pip install tiledb_plot_widget
+pip install tiledb-plot-widget
 ```
 
 Or if you use jupyterlab:
 
 ```bash
-pip install tiledb_plot_widget
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
+pip install tiledb-plot-widget
+jupyter nbextension install --py tiledb.plot.widget --user
+jupyter nbextension enable tiledb.plot.widget --user --py
 ```
 
 If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
 the nbextension:
 ```bash
-jupyter nbextension enable --py [--sys-prefix|--user|--system] tiledb_plot_widget
+jupyter nbextension enable --py [--sys-prefix|--user|--system] tiledb-plot-widget
 ```

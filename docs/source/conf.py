@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# tiledb_plot_widget documentation build configuration file
+# tiledb-plot-widget documentation build configuration file
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -54,8 +54,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'tiledb_plot_widget'
-copyright = '2020, Konstantinos Sarantopoulos'
+project = 'tiledb-plot-widget'
+copyright = '2020, TileDB, Inc.'
 author = 'Konstantinos Sarantopoulos'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -69,7 +69,7 @@ author = 'Konstantinos Sarantopoulos'
 import os
 here = os.path.dirname(__file__)
 repo = os.path.join(here, '..', '..')
-_version_py = os.path.join(repo, 'tiledb_plot_widget', '_version.py')
+_version_py = os.path.join(repo, 'tiledb-plot-widget', '_version.py')
 version_ns = {}
 with open(_version_py) as f:
     exec(f.read(), version_ns)
@@ -116,7 +116,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'tiledb_plot_widgetdoc'
+htmlhelp_basename = 'tiledb-plot-widgetdoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -143,7 +143,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'tiledb_plot_widget.tex', 'tiledb_plot_widget Documentation',
+    (master_doc, 'tiledb-plot-widget.tex', 'tiledb-plot-widget Documentation',
      'Konstantinos Sarantopoulos', 'manual'),
 ]
 
@@ -154,8 +154,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc,
-    'tiledb_plot_widget',
-    'tiledb_plot_widget Documentation',
+    'tiledb-plot-widget',
+    'tiledb-plot-widget Documentation',
      [author], 1)
 ]
 
@@ -167,10 +167,10 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc,
-     'tiledb_plot_widget',
-     'tiledb_plot_widget Documentation',
+     'tiledb-plot-widget',
+     'tiledb-plot-widget Documentation',
      author,
-     'tiledb_plot_widget',
+     'tiledb-plot-widget',
      'Custom Jupyterlab widget for TileDB',
      'Miscellaneous'),
 ]

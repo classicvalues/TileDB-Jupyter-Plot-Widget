@@ -1,5 +1,5 @@
 
-tiledb_plot_widget
+tiledb-plot-widget
 =====================================
 
 Version: |release|
@@ -10,13 +10,9 @@ Custom Jupyterlab widget for TileDB
 Quickstart
 ----------
 
-To get started with tiledb_plot_widget, install with pip::
+To get started with tiledb.plot.widget, install with pip::
 
-    pip install tiledb_plot_widget
-
-or with conda::
-
-    conda install tiledb_plot_widget
+    pip install tiledb-plot-widget
 
 
 Contents

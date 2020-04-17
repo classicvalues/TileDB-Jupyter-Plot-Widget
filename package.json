@@ -1,5 +1,5 @@
 {
-  "name": "tiledb_plot_widget",
+  "name": "tiledb-plot-widget",
   "version": "0.1.0",
   "description": "Custom Jupyterlab widget for TileDB",
   "keywords": [
@@ -13,9 +13,9 @@
     "dist/*.js",
     "css/*.css"
   ],
-  "homepage": "https://github.com/@tiledb/tiledb_plot_widget",
+  "homepage": "https://github.com/TileDB-Inc/TileDB-Jupyter-Plot-Widget",
   "bugs": {
-    "url": "https://github.com/@tiledb/tiledb_plot_widget/issues"
+    "url": "https://github.com/TileDB-Inc/TileDB-Jupyter-Plot-Widget/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -26,18 +26,18 @@
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/@tiledb/tiledb_plot_widget"
+    "url": "https://github.com/TileDB-Inc/TileDB-Jupyter-Plot-Widget"
   },
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
-    "build:labextension": "npm run clean:labextension && mkdirp tiledb_plot_widget/labextension && cd tiledb_plot_widget/labextension && npm pack ../..",
+    "build:labextension": "npm run clean:labextension && mkdirp tiledb/plot/widget/labextension && cd tiledb/plot/widget/labextension && npm pack ../../../..",
     "build:lib": "tsc",
     "build:nbextension": "webpack -p",
     "build:all": "npm run build:labextension && npm run build:nbextension",
     "clean": "npm run clean:lib && npm run clean:nbextension",
     "clean:lib": "rimraf lib",
-    "clean:labextension": "rimraf tiledb_plot_widget/labextension",
-    "clean:nbextension": "rimraf tiledb_plot_widget/nbextension/static/index.js",
+    "clean:labextension": "rimraf tiledb/plot/widget/labextension",
+    "clean:nbextension": "rimraf tiledb/plot/widget/nbextension/static/index.js",
     "prepack": "npm run build:lib",
     "test": "npm run test:firefox",
     "test:chrome": "karma start --browsers=Chrome tests/karma.conf.js",

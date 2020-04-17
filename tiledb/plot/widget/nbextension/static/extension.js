@@ -6,7 +6,7 @@ define(function() {
     window['requirejs'].config({
         map: {
             '*': {
-                'tiledb_plot_widget': 'nbextensions/tiledb_plot_widget/index',
+                'tiledb-plot-widget': 'nbextensions/tiledb-plot-widget/index',
             },
         }
     });

@@ -8,7 +8,7 @@ include .coverage.rc
 include tsconfig.json
 include package.json
 include webpack.config.js
-include tiledb_plot_widget/labextension/*.tgz
+include tiledb/plot/widget/labextension/*.tgz
 
 # Documentation
 graft docs
@@ -25,7 +25,7 @@ graft tests
 prune tests/build
 
 # Javascript files
-graft tiledb_plot_widget/nbextension
+graft tiledb/plot/widget/nbextension
 graft src
 prune **/node_modules
 prune coverage

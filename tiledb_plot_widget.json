@@ -1,5 +1,0 @@
-{
-  "load_extensions": {
-    "tiledb_plot_widget/extension": true
-  }
-}

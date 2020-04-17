@@ -27,7 +27,7 @@ module.exports = [
     entry: './src/extension.ts',
     output: {
       filename: 'index.js',
-      path: path.resolve(__dirname, 'tiledb_plot_widget', 'nbextension', 'static'),
+      path: path.resolve(__dirname, 'tiledb/plot/widget', 'nbextension', 'static'),
       libraryTarget: 'amd'
     },
     module: {
@@ -39,7 +39,7 @@ module.exports = [
   },
 
   /**
-   * Embeddable tiledb_plot_widget bundle
+   * Embeddable tiledb-plot-widget bundle
    *
    * This bundle is almost identical to the notebook extension bundle. The only
    * difference is in the configuration of the webpack public path for the
@@ -54,8 +54,8 @@ module.exports = [
         filename: 'index.js',
         path: path.resolve(__dirname, 'dist'),
         libraryTarget: 'amd',
-        library: "tiledb_plot_widget",
-        publicPath: 'https://unpkg.com/tiledb_plot_widget@' + version + '/dist/'
+        library: "tiledb-plot-widget",
+        publicPath: 'https://unpkg.com/tiledb-plot-widget@' + version + '/dist/'
     },
     devtool: 'source-map',
     module: {
@@ -76,7 +76,7 @@ module.exports = [
     output: {
       filename: 'embed-bundle.js',
       path: path.resolve(__dirname, 'docs', 'source', '_static'),
-      library: "tiledb_plot_widget",
+      library: "tiledb-plot-widget",
       libraryTarget: 'amd'
     },
     module: {

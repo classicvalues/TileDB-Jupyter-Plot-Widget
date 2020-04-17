@@ -9,4 +9,4 @@ coverage:
       default:
         target: 0%
 ignore:
-  - "tiledb_plot_widget/tests"
+  - "tiledb/plot/widget/tests"
