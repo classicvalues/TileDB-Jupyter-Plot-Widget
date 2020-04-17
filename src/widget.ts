@@ -5,6 +5,7 @@ import {
   DOMWidgetModel, DOMWidgetView, ISerializers
 } from '@jupyter-widgets/base';
 import * as d3 from 'd3';
+import debounce from './debounce';
 import {
   MODULE_NAME, MODULE_VERSION
 } from './version';
@@ -41,23 +42,49 @@ class DagVisualizeModel extends DOMWidgetModel {
 
 export
 class DagVisualizeView extends DOMWidgetView {
-  email_input: any;
   data: any;
+  transform: any;
+  svg: any;
+  tooltip: any;
 
   render() {
     this.el.classList.add('tiledb-widget');
+    this.createSVG();
     this.value_changed();
-    this.model.on('change:value', this.value_changed, this);
+    /**
+     * Debounce rendering function so it won't rerender too fast
+     */
+    const debouncedOnChange = debounce(this.value_changed.bind(this) as any, 1500)
+    this.model.on('change:value', debouncedOnChange as any, this);
   }
 
   value_changed() {
     this.data = JSON.parse(this.model.get('value'));
-    setTimeout(() => this.createDag(), 0);
+    /**
+     * Reset html and build new graph
+     */
+    this.createDag();
+  }
+
+  createSVG() {
+    this.svg = d3.select(this.el).append('svg');
+    this.createControls();
+    this.createTooltip();
+  }
+
+  createTooltip() {
+    this.tooltip = d3.select(this.el).append('div')
+    .attr('class', 'tooltip')				
+    .style("opacity", 0);
   }
 
   createDag() {
     /**
-     * D3 example
+     * Remove previous contents
+     */
+    this.svg.selectAll("*").remove();
+    /**
+     * Render d3 graph
      */
     const height = 500;
     const width = 1300;
@@ -71,14 +98,11 @@ class DagVisualizeView extends DOMWidgetView {
     const hasNoParent = (node: string) => edges.every(([,parent]: string[]) => node !== parent);
     const rootNode = nodes.find(hasNoParent);
 
-    this.createControls();
-
     childParentData.push({
       child: rootNode,
       parent: ''
     });
-    
-    const svg = d3.select(this.el).append('svg');
+    const svg = this.svg;
 
     const dataStructure = d3.stratify().id((d: any) => {
       return d.child;
@@ -89,7 +113,7 @@ class DagVisualizeView extends DOMWidgetView {
 
     const connections = svg.append('g').selectAll('path').data(information.links());
 
-    connections.enter().append('path').attr('style', `transform: translateY(${circleSize}px)`).attr('d', (d) => {
+    connections.enter().append('path').attr('style', `transform: translateY(${circleSize}px)`).attr('d', (d: any) => {
       return `M${d.source.x},${d.source.y} C ${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`
     }).attr('class', (d: any) => {
       const target = d.target.data.child;
@@ -101,49 +125,43 @@ class DagVisualizeView extends DOMWidgetView {
     const svgElement = this.el.querySelector('svg');
     svgElement.setAttribute('viewBox',`0 0 ${width} ${height}`);
 
-    const tooltip = d3.select(this.el).append('div')
-    .attr('class', 'tooltip')				
-    .style("opacity", 0);
-
     const circles = svg.append('g').attr('style', `transform: translateY(${circleSize}px)`).selectAll('circle').data(information.descendants());
-    circles.enter().append('circle').attr('cx', (d) => d.x)
+    circles.enter().append('circle').attr('cx', (d: any) => d.x)
       .attr('r', circleSize)
-      .attr('cy', (d) => d.y).attr('class', (d: any) => {
+      .attr('cy', (d: any) => d.y).attr('class', (d: any) => {
         const name = d.data.child;
         return node_details[name].status;
       }).on('mouseover', (d: any) => {
         const name = d.data.child;
         const status = node_details[name].status;
 
-        tooltip.transition()
+        this.tooltip.transition()
             .duration(200)
             .style('opacity', .9);		
-        tooltip.html(`<p>${name}: ${status}</p>`)	
+        this.tooltip.html(`<p>${name}: ${status}</p>`)	
             .style('left', `${d3.event.clientX + 10}px`)
             .style('top', `${d3.event.clientY + 10}px`);	
         }).on('mouseout', () => {
-          tooltip.transition()
+          this.tooltip.transition()
               .duration(500)
               .style('opacity', 0);
         });
-    
-    svg.call(d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
-      svg.attr('transform', () => d3.event.transform)
-   }) as any)
-
-   const zoom = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
-      svg.attr('transform', () => d3.event.transform)
+    const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
+      this.transform = d3.event.transform;
+      
+      svg.attr('transform', () => d3.event.transform);
     });
 
+    svg.call(zoom).on('wheel.zoom', null);
     function zoomHandler(this: any) {
       d3.event.preventDefault();
       const direction = (this.id === 'zoom_in') ? .2 : -.2;
 
-      svg.transition().duration(1000).call(zoom.scaleBy as any, 1 + direction);
+      svg.transition().duration(300).call(zoom.scaleBy as any, 1 + direction);
     }
-
-    d3.selectAll('.zoomControl').on('click', zoomHandler);
-
+    setTimeout(() => {
+      d3.selectAll('.zoomControl').on('click', zoomHandler);
+    }, 0)
   }
 
 

@@ -102,8 +102,14 @@ svg{
 }
 
 .tiledb-widget .zoomControl {
-  position: relative;
+  left: 0;
+  position: absolute;
+  top: 0;
   z-index: 1;
+}
+
+#zoom_out {
+  left: 30px;
 }
 
 @keyframes dash {
