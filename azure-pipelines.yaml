@@ -31,6 +31,8 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
+  - script: brew install node@12
+    displayName: 'Install NodeJS'
   - script: python -m pip install --upgrade ipywidgets traitlets pytest
     # pip installs release candidates by default:
     #   https://github.com/pypa/pip/issues/4969
