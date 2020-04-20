@@ -8,5 +8,5 @@
 Information about the frontend package of the widgets.
 """
 
-module_name = "tiledb-plot-widget"
-module_version = "^0.1.0"
+module_name = "@tiledb-inc/tiledb-plot-widget"
+module_version = ">=0.0.1"
