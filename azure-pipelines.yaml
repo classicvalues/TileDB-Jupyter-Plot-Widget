@@ -33,6 +33,8 @@ jobs:
 
   - script: brew install node@12
     displayName: 'Install NodeJS'
+  - script: brew install yarn
+    displayName: 'Install yarn'
   - script: python -m pip install --upgrade ipywidgets traitlets pytest
     # pip installs release candidates by default:
     #   https://github.com/pypa/pip/issues/4969
