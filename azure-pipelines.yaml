@@ -38,7 +38,7 @@ jobs:
       brew upgrade
       brew cleanup
       brew install yarn
-      brew uninstall --ignore-dependencies openssl; brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb
+      brew switch openssl 1.0.2t
     displayName: 'Install NodeJS and yarn'
     condition: eq(variables['imageName'], 'macOS-10.14')
 
@@ -131,14 +131,13 @@ jobs:
     vmImage: 'ubuntu-16.04'
 
   steps:
-  - task: ExtractVersionFromTag@1
-    inputs:
-      projectFolderPath: '$(Build.SourcesDirectory)'
+  # - task: ExtractVersionFromTag@1
+  #   inputs:
+  #     projectFolderPath: '$(Build.SourcesDirectory)'
   - task: NodeTool@0
     inputs:
       versionSpec: '12.x'
   - script: |
-      echo $(PATCH)
       yarn
     displayName: 'Install dependencies'
     env:
@@ -152,7 +151,7 @@ jobs:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      yarn publish --access public --new-version $(MAJOR).$(MINOR).$(PATCH)
+      yarn publish --access public --new-version 0.0.3
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
