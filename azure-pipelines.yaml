@@ -5,7 +5,7 @@ trigger:
   branches:
     include:
     - master
-  # test and upload my code as an artifact named WebSite
+
 jobs:
 - job: Build
   strategy:
@@ -138,9 +138,11 @@ jobs:
   - script: |
       yarn build
     displayName: 'Build'
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
   - script: |
       npx semantic-release
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
     displayName: 'Release'
+    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
