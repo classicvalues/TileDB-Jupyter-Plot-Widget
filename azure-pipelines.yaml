@@ -75,6 +75,8 @@ jobs:
   - script: python -m pip install --upgrade .
     displayName: 'Test Install'
     condition: ne(variables['Agent.OS'], 'Windows_NT')
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
 
     # Build the python distribution from source
   - script: python setup.py bdist_wheel
