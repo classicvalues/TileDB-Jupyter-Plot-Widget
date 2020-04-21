@@ -138,11 +138,9 @@ jobs:
   - script: |
       yarn build
     displayName: 'Build'
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
   - script: |
       npx semantic-release
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
-    condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
     displayName: 'Release'
