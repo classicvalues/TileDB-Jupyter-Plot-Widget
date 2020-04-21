@@ -32,8 +32,10 @@ jobs:
       architecture: 'x64'
 
   - script: |
-      brew update
       brew uninstall node
+      brew update
+      brew upgrade
+      brew cleanup
       brew install yarn
       node --version
       yarn --version
