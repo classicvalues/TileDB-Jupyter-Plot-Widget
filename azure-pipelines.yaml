@@ -140,7 +140,7 @@ jobs:
     displayName: 'Build'
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
   - script: |
-      npx semantic-release
+      npm publish
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
