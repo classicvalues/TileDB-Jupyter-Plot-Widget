@@ -10,18 +10,18 @@ jobs:
 - job: Build
   strategy:
     matrix:
-      mac_36:
-        imageName: 'macOS-10.14'
-        python.version: '3.6'
-      mac_37:
-        imageName: 'macOS-10.14'
-        python.version: '3.7'
-      # linux_py36:
-      #   imageName: 'ubuntu-16.04'
+      # mac_36:
+      #   imageName: 'macOS-10.14'
       #   python.version: '3.6'
-      # linux_py37:
-      #   imageName: 'ubuntu-16.04'
+      # mac_37:
+      #   imageName: 'macOS-10.14'
       #   python.version: '3.7'
+      linux_py36:
+        imageName: 'ubuntu-16.04'
+        python.version: '3.6'
+      linux_py37:
+        imageName: 'ubuntu-16.04'
+        python.version: '3.7'
   pool:
     vmImage: $(imageName)
 
@@ -47,6 +47,7 @@ jobs:
       sudo apt-get install curl
       curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
       sudo apt-get install nodejs
+      node --version
     displayName: 'Install NodeJS'
     condition: eq(variables['imageName'], 'ubuntu-16.04')
 
@@ -54,6 +55,8 @@ jobs:
       curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       sudo apt update && sudo apt install yarn
+      node --version
+      yarn --version
     displayName: 'Install yarn'
     condition: eq(variables['imageName'], 'ubuntu-16.04')
 
