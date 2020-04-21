@@ -152,7 +152,7 @@ jobs:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      npm publish
+      npm publish --access=public
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
