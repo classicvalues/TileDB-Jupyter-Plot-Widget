@@ -12,13 +12,13 @@ from ._frontend import module_name, module_version
 class Visualize(DOMWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.value = kwargs['data']
-    
-    _value = ''
-    _model_name = Unicode('DagVisualizeModel').tag(sync=True)
+        self.value = kwargs["data"]
+
+    _value = ""
+    _model_name = Unicode("DagVisualizeModel").tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
     _model_module_version = Unicode(module_version).tag(sync=True)
-    _view_name = Unicode('DagVisualizeView').tag(sync=True)
+    _view_name = Unicode("DagVisualizeView").tag(sync=True)
     _view_module = Unicode(module_name).tag(sync=True)
     _view_module_version = Unicode(module_version).tag(sync=True)
     value = Unicode(_value).tag(sync=True)
