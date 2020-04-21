@@ -151,7 +151,8 @@ jobs:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      yarn publish --access public --new-version 0.0.3
+      echo $(./node_modules/.bin/git-tag-version)
+      yarn publish --new-version $(./node_modules/.bin/git-tag-version) --no-git-tag-version --access public
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)

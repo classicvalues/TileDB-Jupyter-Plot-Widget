@@ -39,6 +39,7 @@
     "clean:lib": "rimraf lib",
     "clean:labextension": "rimraf tiledb/plot/widget/labextension",
     "clean:nbextension": "rimraf tiledb/plot/widget/nbextension/static/index.js",
+    "tag-version": "git-tag-version",
     "prepack": "npm run build:lib",
     "release": "semantic-release",
     "test": "npm run test:firefox",
