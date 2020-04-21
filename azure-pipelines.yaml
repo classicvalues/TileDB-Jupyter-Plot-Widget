@@ -33,6 +33,7 @@ jobs:
 
   - script: |
       brew update
+      brew upgrade node
       brew install yarn
       node --version
       yarn --version
