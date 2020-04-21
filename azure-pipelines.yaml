@@ -82,6 +82,8 @@ jobs:
   - script: python setup.py bdist_wheel
     displayName: 'Build wheel'
     condition: ne(variables['Agent.OS'], 'Windows_NT')
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
 
   - bash: |
       set -xeo pipefail
