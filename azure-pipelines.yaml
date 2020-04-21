@@ -33,6 +33,7 @@ jobs:
 
   - script: |
       brew uninstall node
+      brew unlink node@6
       brew update
       brew upgrade
       brew cleanup
