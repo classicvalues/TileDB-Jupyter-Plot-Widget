@@ -33,12 +33,10 @@ jobs:
 
   - script: |
       brew update
-      brew install node@12
-    displayName: 'Update NodeJS'
-    condition: eq(variables['imageName'], 'macOS-10.14')
-
-  - script: brew install yarn
-    displayName: 'Install yarn'
+      brew install yarn
+      node --version
+      yarn --version
+    displayName: 'Install NodeJS and yarn'
     condition: eq(variables['imageName'], 'macOS-10.14')
 
   - script: |
