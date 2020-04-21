@@ -148,7 +148,7 @@ jobs:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      npm publish --access=public
+      yarn publish --access public --new-version 0.0.2
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
