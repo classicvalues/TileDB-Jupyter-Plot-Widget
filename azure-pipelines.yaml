@@ -116,6 +116,8 @@ jobs:
   - script: python setup.py bdist_wheel
     displayName: 'Build wheel'
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
 
   - task: TwineAuthenticate@1
     displayName: 'Twine Authenticate'
@@ -137,10 +139,16 @@ jobs:
   - script: |
       yarn
     displayName: 'Install dependencies'
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
+
   - script: |
       yarn build
     displayName: 'Build'
     condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags'))
+    env:
+      NPM_TOKEN: $(NPM_TOKEN)
+
   - script: |
       npm publish
     env:
