@@ -131,10 +131,14 @@ jobs:
     vmImage: 'ubuntu-16.04'
 
   steps:
+  - task: ExtractVersionFromTag@1
+    inputs:
+      projectFolderPath: '$(Build.SourcesDirectory)'
   - task: NodeTool@0
     inputs:
       versionSpec: '12.x'
   - script: |
+      echo $(PATCH)
       yarn
     displayName: 'Install dependencies'
     env:
@@ -148,7 +152,7 @@ jobs:
       NPM_TOKEN: $(NPM_TOKEN)
 
   - script: |
-      yarn publish --access public --new-version 0.0.2
+      yarn publish --access public --new-version $(MAJOR).$(MINOR).$(PATCH)
     env:
       GITHUB_TOKEN: $(GITHUB_TOKEN)
       NPM_TOKEN: $(NPM_TOKEN)
