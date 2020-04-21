@@ -31,8 +31,10 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-  - script: brew install node@12
-    displayName: 'Install NodeJS'
+  - script: |
+      brew update
+      brew upgrade node
+    displayName: 'Update NodeJS'
     condition: eq(variables['imageName'], 'macOS-10.14')
 
   - script: brew install yarn
