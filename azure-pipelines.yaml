@@ -138,6 +138,8 @@ jobs:
     inputs:
       versionSpec: '12.x'
   - script: |
+      echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      cat ~/.npmrc
       yarn
     displayName: 'Install dependencies'
     env:
