@@ -45,6 +45,7 @@ class DagVisualizeView extends DOMWidgetView {
   data: any;
   transform: any;
   svg: any;
+  wrapper: any;
   tooltip: any;
 
   render() {
@@ -67,7 +68,8 @@ class DagVisualizeView extends DOMWidgetView {
   }
 
   createSVG() {
-    this.svg = d3.select(this.el).append('svg');
+    this.wrapper = d3.select(this.el).append('svg').append('g');
+    this.svg = d3.select(this.el).select('svg');
     this.createControls();
     this.createTooltip();
   }
@@ -82,7 +84,7 @@ class DagVisualizeView extends DOMWidgetView {
     /**
      * Remove previous contents
      */
-    this.svg.selectAll("*").remove();
+    this.wrapper.selectAll("*").remove();
     /**
      * Render d3 graph
      */
@@ -111,7 +113,7 @@ class DagVisualizeView extends DOMWidgetView {
     const treeStructure = d3.tree().size([width, height - 100]);
     const information = treeStructure(dataStructure);
 
-    const connections = svg.append('g').selectAll('path').data(information.links());
+    const connections = this.wrapper.append('g').selectAll('path').data(information.links());
 
     connections.enter().append('path').attr('style', `transform: translateY(${circleSize}px)`).attr('d', (d: any) => {
       return `M${d.source.x},${d.source.y} C ${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`
@@ -125,7 +127,7 @@ class DagVisualizeView extends DOMWidgetView {
     const svgElement = this.el.querySelector('svg');
     svgElement.setAttribute('viewBox',`0 0 ${width} ${height}`);
 
-    const circles = svg.append('g').attr('style', `transform: translateY(${circleSize}px)`).selectAll('circle').data(information.descendants());
+    const circles = this.wrapper.append('g').attr('style', `transform: translateY(${circleSize}px)`).selectAll('circle').data(information.descendants());
     circles.enter().append('circle').attr('cx', (d: any) => d.x)
       .attr('r', circleSize)
       .attr('cy', (d: any) => d.y).attr('class', (d: any) => {
@@ -147,9 +149,7 @@ class DagVisualizeView extends DOMWidgetView {
               .style('opacity', 0);
         });
     const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
-      this.transform = d3.event.transform;
-      
-      svg.attr('transform', () => d3.event.transform);
+      this.wrapper.attr('transform', d3.event.transform);
     });
 
     svg.call(zoom).on('wheel.zoom', null);
@@ -157,7 +157,11 @@ class DagVisualizeView extends DOMWidgetView {
     function zoomHandler(this: any) {
       d3.event.preventDefault();
       const direction = (this.id === 'zoom_in') ? .2 : -.2;
-
+      /**
+       * In SVG 1.1 <svg> elements did not support transform attributes. In SVG 2 it is proposed that they should.
+       * Chrome and Firefox implement this part of the SVG 2 specification, Safari does not yet do so and IE11 never will.
+       * That's why we apply transform to the "g" element instead of the "svg"
+       */
       svg.transition().duration(300).call(zoom.scaleBy as any, 1 + direction);
     }
 

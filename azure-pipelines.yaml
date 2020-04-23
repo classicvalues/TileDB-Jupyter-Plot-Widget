@@ -131,9 +131,6 @@ jobs:
     vmImage: 'ubuntu-16.04'
 
   steps:
-  # - task: ExtractVersionFromTag@1
-  #   inputs:
-  #     projectFolderPath: '$(Build.SourcesDirectory)'
   - task: NodeTool@0
     inputs:
       versionSpec: '12.x'
