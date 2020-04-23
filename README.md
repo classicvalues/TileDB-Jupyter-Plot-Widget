@@ -4,10 +4,11 @@ Custom Jupyterlab widget for TileDB
 
 ## Installation
 
-You can install using `pip`:
+You can install using `pip` and `jupyterlab`:
 
 ```bash
 pip install tiledb-plot-widget
+jupyter labextension install @tiledb-inc/tiledb-plot-widget
 ```
 
 Or if you use jupyterlab:
