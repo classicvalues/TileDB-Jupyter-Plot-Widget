@@ -9,8 +9,19 @@ import debounce from './debounce';
 import {
   MODULE_NAME, MODULE_VERSION
 } from './version';
-import '../css/widget.css'
+import '../css/widget.css';
 
+interface DataType {
+  nodes: string[];
+  edges: Array<string[]>;
+  node_details: {
+    [s: string]: {
+      status: string;
+      name: string;
+    }
+  };
+  root_nodes?: string[];
+}
 
 export
 class DagVisualizeModel extends DOMWidgetModel {
@@ -39,10 +50,9 @@ class DagVisualizeModel extends DOMWidgetModel {
   static view_module_version = MODULE_VERSION;
 }
 
-
 export
 class DagVisualizeView extends DOMWidgetView {
-  data: any;
+  data: DataType | undefined;
   transform: any;
   svg: any;
   wrapper: any;
@@ -106,6 +116,12 @@ class DagVisualizeView extends DOMWidgetView {
     return this.verticalOffset;
   }
 
+  getRootNodes(nodes: DataType['nodes'], edges: DataType['edges']): string[] {
+    const hasNoParent = (node: string) => edges.every(([, parent]: string[]) => node !== parent);
+
+    return nodes.filter(hasNoParent);
+  }
+
   createDag() {
     /**
      * Remove previous contents
@@ -116,15 +132,14 @@ class DagVisualizeView extends DOMWidgetView {
      */
     const height = 500;
     const width = 1300;
-    const { nodes, edges, node_details } = this.data;
+    const { nodes, edges, node_details, root_nodes } = this.data as DataType;
     const childParentData = edges.map((d: any) => ({
       child: d[1],
       parent: d[0]
     }));
     const numberOfNodes = nodes.length;
     const circleSize = Math.max(20 - (numberOfNodes * 0.08), 3);
-    const hasNoParent = (node: string) => edges.every(([,parent]: string[]) => node !== parent);
-    const rootNodes: string[] = nodes.filter(hasNoParent);
+    const rootNodes: string[] = root_nodes || this.getRootNodes(nodes, edges);
     /**
      * In d3 hierarchical graphs can only have
      * a single root, therefore we add a fake node as
