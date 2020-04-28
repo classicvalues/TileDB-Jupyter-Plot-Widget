@@ -121,6 +121,10 @@ svg{
   background-size: 15px;
 }
 
+.tiledb-widget .depth-0 {
+  opacity: 0;
+}
+
 .resetControl {
   left: 80px;
   background-image: var(--jp-image-zoomreset);
