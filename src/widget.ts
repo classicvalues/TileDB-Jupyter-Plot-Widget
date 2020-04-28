@@ -11,14 +11,17 @@ import {
 } from './version';
 import '../css/widget.css';
 
+
+type NodeType = {
+  status: string;
+  name: string;
+};
+
 interface DataType {
   nodes: string[];
   edges: Array<string[]>;
   node_details: {
-    [s: string]: {
-      status: string;
-      name: string;
-    }
+    [s: string]: NodeType;
   };
   root_nodes?: string[];
 }
@@ -50,6 +53,9 @@ class DagVisualizeModel extends DOMWidgetModel {
   static view_module_version = MODULE_VERSION;
 }
 
+const height = 500;
+const width = 1300;
+
 export
 class DagVisualizeView extends DOMWidgetView {
   data: DataType | undefined;
@@ -80,9 +86,40 @@ class DagVisualizeView extends DOMWidgetView {
 
   createSVG() {
     this.wrapper = d3.select(this.el).append('svg').append('g');
-    this.svg = d3.select(this.el).select('svg');
+    this.svg = d3.select(this.el).select('svg').attr("viewBox", "0 0 " + width + " " + height )
     this.createControls();
     this.createTooltip();
+    this.zoom();
+  }
+
+
+  zoom() {
+    const svg = this.svg;
+    const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
+      this.wrapper.attr('transform', d3.event.transform);
+    });
+
+    svg.call(zoom).on('wheel.zoom', null);
+
+    function zoomHandler(this: any) {
+      d3.event.preventDefault();
+      const direction = (this.id === 'zoom_in') ? .2 : -.2;
+      /**
+       * In SVG 1.1 <svg> elements did not support transform attributes. In SVG 2 it is proposed that they should.
+       * Chrome and Firefox implement this part of the SVG 2 specification, Safari does not yet do so and IE11 never will.
+       * That's why we apply transform to the "g" element instead of the "svg"
+       */
+      svg.transition().duration(300).call(zoom.scaleBy as any, 1 + direction);
+    }
+
+    function resetHandler(this: any) {
+      svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+    }
+
+    setTimeout(() => {
+      d3.select(this.el).selectAll('.zoomControl').on('click', zoomHandler);
+      d3.select(this.el).selectAll('.resetControl').on('click', resetHandler);
+    }, 0);
   }
 
   createTooltip() {
@@ -127,119 +164,60 @@ class DagVisualizeView extends DOMWidgetView {
      * Remove previous contents
      */
     this.wrapper.selectAll("*").remove();
-    /**
-     * Render d3 graph
-     */
-    const height = 500;
-    const width = 1300;
     const { nodes, edges, node_details, root_nodes } = this.data as DataType;
-    const childParentData = edges.map((d: any) => ({
-      child: d[1],
-      parent: d[0]
-    }));
     const numberOfNodes = nodes.length;
-    const circleSize = Math.max(20 - (numberOfNodes * 0.08), 3);
+    const circleSize = Math.max(18 - (numberOfNodes * 0.08), 3);
+    const links = edges.map(([parent, child]) => ({
+      source: parent,
+      target: child,
+    }))
     const rootNodes: string[] = (root_nodes && !!root_nodes.length && root_nodes) || this.getRootNodes(nodes, edges);
-    /**
-     * In d3 hierarchical graphs can only have
-     * a single root, therefore we add a fake node as
-     * root in case of multiple root nodes and we hide it
-     */
-    const fauxRootNode = 'faux_node_root';
-    nodes.push(fauxRootNode);
-    node_details[fauxRootNode] = {
-      status: '',
-      name: fauxRootNode
-    };
-    /**
-     * Find all the root nodes and add the fake root node
-     * as their parent to avoid making a tree with many roots.
-     */
-    rootNodes.forEach((rootNode: string) => {
-      childParentData.push({
-        child: rootNode,
-        parent: fauxRootNode,
+    const nodeDetails = Object.keys(node_details).map((node: string, i: number) => ({
+      index: i,
+      status: node_details[node].status,
+      id: node,
+      fy: ~rootNodes.indexOf(node) ? circleSize : null,
+    }))
+    const simulation = d3.forceSimulation(nodeDetails)
+    .force("charge", d3.forceManyBody().strength(-200).distanceMax(height / 3))
+    .force("link", d3.forceLink(links).distance(circleSize * 2).id((d: any) => d.id))
+    .force("x", d3.forceX(width / 2))
+    .force("y", d3.forceY(height / 2))
+    .stop();
+
+    simulation.tick(300);
+
+    this.wrapper.append("g")
+      .selectAll("path")
+      .data(links)
+      .enter().append("path")
+      .attr('d', (d: any) => {
+        return `M${d.source.x},${d.source.y} C ${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`
       })
-    });
+      .attr('class', (d: any) => `path-${d.target.status}`);
 
-    childParentData.push({
-      child: fauxRootNode,
-      parent: ''
-    });
-
-    const svg = this.svg;
-
-    const dataStructure = d3.stratify().id((d: any) => {
-      return d.child;
-    }).parentId((d: any) => d.parent)(childParentData);
-
-    const treeStructure = d3.tree().size([width, height - 50]);
-    const information = treeStructure(dataStructure);
-    const descendants = information.descendants();
-    const verticalOffsetItems = this.calculateYOffset(descendants, circleSize, fauxRootNode);
-    const connections = this.wrapper.append('g').selectAll('path').data(information.links());
-
-    connections.enter().append('path').attr('style', `transform: translateY(${verticalOffsetItems}px)`).attr('d', (d: any) => {
-      return `M${d.source.x},${d.source.y} C ${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`
-    }).attr('class', (d: any) => {
-      const target = d.target.data.child;
-      const status = node_details[target].status;
-
-      return `path-${status} depth-${d.source.depth}`;
-    });
-
-    const svgElement = this.el.querySelector('svg');
-    svgElement.setAttribute('viewBox',`0 0 ${width} ${height}`);
-
-    const circles = this.wrapper.append('g').attr('style', `transform: translateY(${verticalOffsetItems}px)`).selectAll('circle').data(descendants);
-    circles.enter().append('circle').attr('cx', (d: any) => d.x)
-      .attr('r', circleSize)
-      .attr('cy', (d: any) => d.y).attr('class', (d: any) => {
-        const name = d.data.child;
-        return `${node_details[name].status} depth-${d.depth}`;
-      }).on('mouseover', (d: any) => {
-        const name = d.data.child;
-        const status = node_details[name].status;
-
+    this.wrapper.append("g")
+      .selectAll("circle")
+      .data(nodeDetails)
+      .enter().append("circle")
+      .attr("cx", (d:any) => d.x)
+      .attr("cy", (d:any) => d.y)
+      .attr("r", circleSize)
+      .attr('class', (d: NodeType) => d.status)
+      .on('mouseover', (d: any) => {
         this.tooltip.transition()
-            .duration(200)
-            .style('opacity', .9);		
-        this.tooltip.html(`<p>${name}: ${status}</p>`)	
-            .style('left', `${d3.event.clientX + 10}px`)
-            .style('top', `${d3.event.clientY + 10}px`);	
-        }).on('mouseout', () => {
-          this.tooltip.transition()
-              .duration(500)
-              .style('opacity', 0);
-        });
-    const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
-      this.wrapper.attr('transform', d3.event.transform);
-    });
+          .duration(200)
+          .style('opacity', .9);		
+      this.tooltip.html(`<p>${d.id}: ${d.status}</p>`)	
+          .style('left', `${d3.event.clientX + 10}px`)
+          .style('top', `${d3.event.clientY + 10}px`);	
+      }).on('mouseout', () => {
+        this.tooltip.transition()
+            .duration(500)
+            .style('opacity', 0);
+      });
 
-    svg.call(zoom).on('wheel.zoom', null);
-
-    function zoomHandler(this: any) {
-      d3.event.preventDefault();
-      const direction = (this.id === 'zoom_in') ? .2 : -.2;
-      /**
-       * In SVG 1.1 <svg> elements did not support transform attributes. In SVG 2 it is proposed that they should.
-       * Chrome and Firefox implement this part of the SVG 2 specification, Safari does not yet do so and IE11 never will.
-       * That's why we apply transform to the "g" element instead of the "svg"
-       */
-      svg.transition().duration(300).call(zoom.scaleBy as any, 1 + direction);
-    }
-
-    function resetHandler(this: any) {
-      svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
-    }
-
-    setTimeout(() => {
-      d3.selectAll('.zoomControl').on('click', zoomHandler);
-      d3.selectAll('.resetControl').on('click', resetHandler);
-    }, 0)
   }
-
-
 
   createControls() {
     const zoomInButton = document.createElement('button');
