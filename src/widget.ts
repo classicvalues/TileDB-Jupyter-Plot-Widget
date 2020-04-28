@@ -47,6 +47,7 @@ class DagVisualizeView extends DOMWidgetView {
   svg: any;
   wrapper: any;
   tooltip: any;
+  verticalOffset: number | undefined;
 
   render() {
     this.el.classList.add('tiledb-widget');
@@ -80,6 +81,31 @@ class DagVisualizeView extends DOMWidgetView {
     .style("opacity", 0);
   }
 
+  /**
+   * Method to calculate vertical offset from the hidden "fake" root node
+   * @param descendants The hierarchy points
+   * @param circleSize The size of the circle
+   * @param fauxRootNode The name of the fake root node
+   */
+  calculateYOffset(descendants: d3.HierarchyPointNode<unknown>[], circleSize: number, fauxRootNode: string): number {
+    /**
+     * If we have already calculated the offset just return it.
+     * If not calculate the offset
+     */
+    if (typeof this.verticalOffset === 'undefined') {
+      const originalRoot = descendants.find((node: any) => Boolean(node.parent && node.parent.id === fauxRootNode));
+      /**
+       * Calculate the offset of the original root node,
+       * since the first faux root node that we added,
+       * we hide it and create an empty space to the top.
+       */
+      const yOffset = originalRoot ? originalRoot.y : 0;
+      this.verticalOffset = circleSize - yOffset / 2;
+    }
+
+    return this.verticalOffset;
+  }
+
   createDag() {
     /**
      * Remove previous contents
@@ -98,41 +124,64 @@ class DagVisualizeView extends DOMWidgetView {
     const numberOfNodes = nodes.length;
     const circleSize = Math.max(20 - (numberOfNodes * 0.08), 3);
     const hasNoParent = (node: string) => edges.every(([,parent]: string[]) => node !== parent);
-    const rootNode = nodes.find(hasNoParent);
+    const rootNodes: string[] = nodes.filter(hasNoParent);
+    /**
+     * In d3 hierarchical graphs can only have
+     * a single root, therefore we add a fake node as
+     * root in case of multiple root nodes and we hide it
+     */
+    const fauxRootNode = 'faux_node_root';
+    nodes.push(fauxRootNode);
+    node_details[fauxRootNode] = {
+      status: '',
+      name: fauxRootNode
+    };
+    /**
+     * Find all the root nodes and add the fake root node
+     * as their parent to avoid making a tree with many roots.
+     */
+    rootNodes.forEach((rootNode: string) => {
+      childParentData.push({
+        child: rootNode,
+        parent: fauxRootNode,
+      })
+    });
 
     childParentData.push({
-      child: rootNode,
+      child: fauxRootNode,
       parent: ''
     });
+
     const svg = this.svg;
 
     const dataStructure = d3.stratify().id((d: any) => {
       return d.child;
     }).parentId((d: any) => d.parent)(childParentData);
 
-    const treeStructure = d3.tree().size([width, height - 100]);
+    const treeStructure = d3.tree().size([width, height - 50]);
     const information = treeStructure(dataStructure);
-
+    const descendants = information.descendants();
+    const verticalOffsetItems = this.calculateYOffset(descendants, circleSize, fauxRootNode);
     const connections = this.wrapper.append('g').selectAll('path').data(information.links());
 
-    connections.enter().append('path').attr('style', `transform: translateY(${circleSize}px)`).attr('d', (d: any) => {
+    connections.enter().append('path').attr('style', `transform: translateY(${verticalOffsetItems}px)`).attr('d', (d: any) => {
       return `M${d.source.x},${d.source.y} C ${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`
     }).attr('class', (d: any) => {
       const target = d.target.data.child;
       const status = node_details[target].status;
 
-      return `path-${status}`;
+      return `path-${status} depth-${d.source.depth}`;
     });
 
     const svgElement = this.el.querySelector('svg');
     svgElement.setAttribute('viewBox',`0 0 ${width} ${height}`);
 
-    const circles = this.wrapper.append('g').attr('style', `transform: translateY(${circleSize}px)`).selectAll('circle').data(information.descendants());
+    const circles = this.wrapper.append('g').attr('style', `transform: translateY(${verticalOffsetItems}px)`).selectAll('circle').data(descendants);
     circles.enter().append('circle').attr('cx', (d: any) => d.x)
       .attr('r', circleSize)
       .attr('cy', (d: any) => d.y).attr('class', (d: any) => {
         const name = d.data.child;
-        return node_details[name].status;
+        return `${node_details[name].status} depth-${d.depth}`;
       }).on('mouseover', (d: any) => {
         const name = d.data.child;
         const status = node_details[name].status;
