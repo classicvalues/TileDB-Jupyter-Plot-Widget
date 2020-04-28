@@ -139,7 +139,7 @@ class DagVisualizeView extends DOMWidgetView {
     }));
     const numberOfNodes = nodes.length;
     const circleSize = Math.max(20 - (numberOfNodes * 0.08), 3);
-    const rootNodes: string[] = root_nodes || this.getRootNodes(nodes, edges);
+    const rootNodes: string[] = (root_nodes && !!root_nodes.length && root_nodes) || this.getRootNodes(nodes, edges);
     /**
      * In d3 hierarchical graphs can only have
      * a single root, therefore we add a fake node as
