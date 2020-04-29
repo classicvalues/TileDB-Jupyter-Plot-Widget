@@ -220,17 +220,6 @@ class DagVisualizeView extends DOMWidgetView {
             .style('opacity', 0);
       });
     };
-    // const simulation = d3.forceSimulation(nodeDetails)
-    // .force("charge", d3.forceManyBody().strength(-200).distanceMax(height / 3))
-    // .force("link", d3.forceLink(links).distance(circleSize * 2).id((d: any) => d.id))
-    // .force("x", d3.forceX(width / 2))
-    // .force("y", d3.forceY(height / 2))
-    // .stop();
-
-    // simulation.tick(300);
-
-    
-
   }
 
   createControls() {

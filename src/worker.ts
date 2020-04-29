@@ -12,16 +12,19 @@ onmessage = function(event) {
   const height = 500;
 
   var simulation = d3.forceSimulation(nodes)
-        .force("charge", d3.forceManyBody().strength(-5000 / numberOfNodes).distanceMax(height))
-        .force("link", d3.forceLink(links).id((d: any) => d.id))
-        .force("x", d3.forceX(width / 2))
-        .force("y", d3.forceY(height / 2))
+        .force('charge', d3.forceManyBody().strength(-5500 / numberOfNodes).distanceMax(height))
+        .force('link', d3.forceLink(links).id((d: any) => d.id))
+        .force('x', d3.forceX(width / 2))
+        .force('y', d3.forceY(height / 2))
         .stop();
 
   for (var i = 0, n = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay())); i < n; ++i) {
-    postMessage({type: "tick", progress: i / n});
+    postMessage({type: 'tick', progress: i / n});
+    /**
+     * Run all simulations
+     */
     simulation.tick();
   }
 
-  postMessage({type: "end", nodes: nodes, links: links});
+  postMessage({type: 'end', nodes: nodes, links: links});
 };
