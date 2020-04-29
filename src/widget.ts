@@ -10,7 +10,7 @@ import {
   MODULE_NAME, MODULE_VERSION
 } from './version';
 import '../css/widget.css';
-
+import workerURL from 'file-loader!../lib/worker.js';
 
 type NodeType = {
   status: string;
@@ -160,10 +160,6 @@ class DagVisualizeView extends DOMWidgetView {
   }
 
   createDag() {
-    /**
-     * Remove previous contents
-     */
-    this.wrapper.selectAll("*").remove();
     const { nodes, edges, node_details, root_nodes } = this.data as DataType;
     const numberOfNodes = nodes.length;
     const circleSize = Math.max(18 - (numberOfNodes * 0.08), 3);
@@ -178,16 +174,23 @@ class DagVisualizeView extends DOMWidgetView {
       id: node,
       fy: ~rootNodes.indexOf(node) ? circleSize : null,
     }))
-    const simulation = d3.forceSimulation(nodeDetails)
-    .force("charge", d3.forceManyBody().strength(-200).distanceMax(height / 3))
-    .force("link", d3.forceLink(links).distance(circleSize * 2).id((d: any) => d.id))
-    .force("x", d3.forceX(width / 2))
-    .force("y", d3.forceY(height / 2))
-    .stop();
 
-    simulation.tick(300);
+    const worker = new Worker(workerURL);
+    worker.postMessage({
+      nodes: nodeDetails,
+      links
+    });
+    worker.onmessage = (event) => {
+      if (event.data.type !== 'end') {
+        return;
+      }
+      /**
+       * Remove previous contents
+       */
+      this.wrapper.selectAll("*").remove();
+      const { nodes, links } = event.data
 
-    this.wrapper.append("g")
+      this.wrapper.append("g")
       .selectAll("path")
       .data(links)
       .enter().append("path")
@@ -198,7 +201,7 @@ class DagVisualizeView extends DOMWidgetView {
 
     this.wrapper.append("g")
       .selectAll("circle")
-      .data(nodeDetails)
+      .data(nodes)
       .enter().append("circle")
       .attr("cx", (d:any) => d.x)
       .attr("cy", (d:any) => d.y)
@@ -216,6 +219,17 @@ class DagVisualizeView extends DOMWidgetView {
             .duration(500)
             .style('opacity', 0);
       });
+    };
+    // const simulation = d3.forceSimulation(nodeDetails)
+    // .force("charge", d3.forceManyBody().strength(-200).distanceMax(height / 3))
+    // .force("link", d3.forceLink(links).distance(circleSize * 2).id((d: any) => d.id))
+    // .force("x", d3.forceX(width / 2))
+    // .force("y", d3.forceY(height / 2))
+    // .stop();
+
+    // simulation.tick(300);
+
+    
 
   }
 
