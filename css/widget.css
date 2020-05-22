@@ -29,6 +29,7 @@
   --jp-image-zoomout: url('../icons/zoomout.svg');
   --jp-image-zoomreset: url('../icons/zoomreset.svg');
 
+  padding: 20px 0;
   position: relative;
   width: 100%;
 }

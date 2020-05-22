@@ -17,6 +17,10 @@ type NodeType = {
   name: string;
 };
 
+type Positions = {
+  [s: string]: [number, number];
+}
+
 interface DataType {
   nodes: string[];
   edges: Array<string[]>;
@@ -24,6 +28,7 @@ interface DataType {
     [s: string]: NodeType;
   };
   root_nodes?: string[];
+  positions: Positions;
 }
 
 export
@@ -53,9 +58,6 @@ class DagVisualizeModel extends DOMWidgetModel {
   static view_module_version = MODULE_VERSION;
 }
 
-const height = 500;
-const width = 1300;
-
 export
 class DagVisualizeView extends DOMWidgetView {
   data: DataType | undefined;
@@ -64,6 +66,9 @@ class DagVisualizeView extends DOMWidgetView {
   wrapper: any;
   tooltip: any;
   verticalOffset: number | undefined;
+  bounds: [number, number] | undefined;
+  initialized: boolean | undefined;
+  positions: Positions | undefined;
 
   render() {
     this.el.classList.add('tiledb-widget');
@@ -84,16 +89,37 @@ class DagVisualizeView extends DOMWidgetView {
     this.createDag();
   }
 
+  calculateBounds(positions: Positions): [number, number] {
+    if (typeof this.bounds === 'undefined') {
+      const xNums = Object.keys(positions).map((pos: keyof Positions) => positions[pos][0]);
+      const yNums = Object.keys(positions).map((pos: keyof Positions) => positions[pos][1]);
+      const padding = 30;
+      const verticalPadding = 60;
+      const maxHorizontalCoordinate = Math.max(...xNums);
+      let maxVerticalCoordinate = Math.max(...yNums);
+      // We don't want the ratio of width / height to be too disproportionate
+      const constrainRatio = .25;
+      maxVerticalCoordinate = Math.max(maxHorizontalCoordinate * constrainRatio, maxVerticalCoordinate + verticalPadding);
+
+      this.bounds = [maxHorizontalCoordinate + padding, maxVerticalCoordinate];
+    }
+
+    return this.bounds as [number, number];
+  }
+
   createSVG() {
     this.wrapper = d3.select(this.el).append('svg').append('g');
-    this.svg = d3.select(this.el).select('svg').attr("viewBox", "0 0 " + width + " " + height )
+    this.svg = d3.select(this.el).select('svg');
     this.createControls();
     this.createTooltip();
-    this.zoom();
   }
 
 
   zoom() {
+    if (this.initialized) {
+      return;
+    }
+    const [width, height] = this.bounds as [number, number];
     const svg = this.svg;
     const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
       this.wrapper.attr('transform', d3.event.transform);
@@ -120,6 +146,7 @@ class DagVisualizeView extends DOMWidgetView {
       d3.select(this.el).selectAll('.zoomControl').on('click', zoomHandler);
       d3.select(this.el).selectAll('.resetControl').on('click', resetHandler);
     }, 0);
+    this.initialized = true;
   }
 
   createTooltip() {
@@ -160,19 +187,29 @@ class DagVisualizeView extends DOMWidgetView {
   }
 
   createDag() {
-    const { nodes, edges, node_details, root_nodes } = this.data as DataType;
+    const { nodes, edges, node_details, positions } = this.data as DataType;
+    const bounds = this.calculateBounds(positions);
+    /**
+     * Sometimes during updates we are getting different/weird positions object
+     * So we save and re-use the first positions object we are getting
+     */
+    this.positions = this.positions || positions;
+    this.svg.attr("viewBox", "0 0 " + bounds[0] + " " + bounds[1] );
+    this.zoom();
     const numberOfNodes = nodes.length;
-    const circleSize = Math.max(18 - (numberOfNodes * 0.08), 3);
+    const biggestSide = Math.max(...bounds) - 20; // Remove padding
+    const circleSize = Math.min((biggestSide / numberOfNodes), 30);
     const links = edges.map(([parent, child]) => ({
       source: parent,
       target: child,
-    }))
-    const rootNodes: string[] = (root_nodes && !!root_nodes.length && root_nodes) || this.getRootNodes(nodes, edges);
+    }));
+    const padding = 20;
     const nodeDetails = Object.keys(node_details).map((node: string, i: number) => ({
       index: i,
       status: node_details[node].status,
       id: node,
-      fy: ~rootNodes.indexOf(node) ? circleSize : null,
+      fx: (this.positions as Positions)[node][0],
+      fy: (this.positions as Positions)[node][1] + padding,
     }))
 
     const worker = new Worker(workerURL);
