@@ -2,7 +2,7 @@
   "compilerOptions": {
     "declaration": true,
     "esModuleInterop":true,
-    "lib": ["es2015", "dom"],
+    "lib": ["es2015", "dom", "WebWorker"],
     "module": "commonjs",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -17,6 +17,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
+    "src/**/*.tsx", "src/worker.js",
   ]
 }

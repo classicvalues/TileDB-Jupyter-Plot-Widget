@@ -20,6 +20,8 @@ lib64/
 parts/
 sdist/
 var/
+docs/source/_static/
+tiledb/plot/widget/nbextension/static/
 *.egg-info/
 .installed.cfg
 *.egg
