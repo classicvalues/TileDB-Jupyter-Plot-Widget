@@ -97,11 +97,8 @@ class DagVisualizeView extends DOMWidgetView {
       const verticalPadding = 60;
       const maxHorizontalCoordinate = Math.max(...xNums);
       let maxVerticalCoordinate = Math.max(...yNums);
-      // We don't want the ratio of width / height to be too disproportionate
-      const constrainRatio = .25;
-      maxVerticalCoordinate = Math.max(maxHorizontalCoordinate * constrainRatio, maxVerticalCoordinate + verticalPadding);
 
-      this.bounds = [maxHorizontalCoordinate + padding, maxVerticalCoordinate];
+      this.bounds = [maxHorizontalCoordinate + padding, maxVerticalCoordinate + verticalPadding];
     }
 
     return this.bounds as [number, number];
@@ -114,6 +111,19 @@ class DagVisualizeView extends DOMWidgetView {
     this.createTooltip();
   }
 
+  getYScale(): number {
+    const { nodes } = this.data as DataType;
+    const numberOfNodes = nodes.length;
+
+    if (numberOfNodes < 30) {
+      return .5 / (30 / numberOfNodes)
+    } else if (numberOfNodes > 500) {
+      return 2;
+    }
+
+    return 1;
+  }
+
 
   zoom() {
     if (this.initialized) {
@@ -121,7 +131,8 @@ class DagVisualizeView extends DOMWidgetView {
     }
     const [width, height] = this.bounds as [number, number];
     const svg = this.svg;
-    const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height]]).on('zoom', () => {
+    const yScale = this.getYScale();
+    const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height * yScale]]).on('zoom', () => {
       this.wrapper.attr('transform', d3.event.transform);
     });
 
@@ -189,28 +200,34 @@ class DagVisualizeView extends DOMWidgetView {
   createDag() {
     const { nodes, edges, node_details, positions } = this.data as DataType;
     const bounds = this.calculateBounds(positions);
+    const numberOfNodes = nodes.length;
+    const lessThanThirtyNodes = numberOfNodes < 30;
+    const yScale = this.getYScale();
+    const maxHeight = bounds[1];
+    const padding = 30;
     /**
      * Sometimes during updates we are getting different/weird positions object
      * So we save and re-use the first positions object we are getting
      */
     this.positions = this.positions || positions;
-    this.svg.attr("viewBox", "0 0 " + bounds[0] + " " + bounds[1] );
+    this.svg.attr("viewBox", `0 0 ${bounds[0]} ${maxHeight * yScale + padding}`);
     this.zoom();
-    const numberOfNodes = nodes.length;
-    const biggestSide = Math.max(...bounds) - 20; // Remove padding
-    const circleSize = Math.min((biggestSide / numberOfNodes), 30);
+    
+    const biggestSide = Math.max(...bounds) - padding; // Remove padding
+    const circleSize = Math.min((biggestSide / numberOfNodes), 30) * yScale;
+
     const links = edges.map(([parent, child]) => ({
       source: parent,
       target: child,
     }));
-    const padding = 20;
+    
     const nodeDetails = Object.keys(node_details).map((node: string, i: number) => ({
       index: i,
       status: node_details[node].status,
       id: node,
       fx: (this.positions as Positions)[node][0],
-      fy: (this.positions as Positions)[node][1] + padding,
-    }))
+      fy: (maxHeight - (this.positions as Positions)[node][1] - circleSize) * yScale,
+    }));
 
     const worker = new Worker(workerURL);
     worker.postMessage({
@@ -243,7 +260,7 @@ class DagVisualizeView extends DOMWidgetView {
       .attr("cx", (d:any) => d.x)
       .attr("cy", (d:any) => d.y)
       .attr("r", circleSize)
-      .attr('class', (d: NodeType) => d.status)
+      .attr('class', (d: NodeType) => `${d.status} ${lessThanThirtyNodes ? 'node--small' : ''}`)
       .on('mouseover', (d: any) => {
         this.tooltip.transition()
           .duration(200)
