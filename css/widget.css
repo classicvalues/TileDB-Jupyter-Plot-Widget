@@ -72,6 +72,10 @@ svg{
   stroke-width: 3px;
 }
 
+.tiledb-widget .Running.node--small {
+  stroke-width: 1px;
+}
+
 .tiledb-widget .path-Running {
   animation: dash-full 1s linear;
   animation-iteration-count: infinite;
