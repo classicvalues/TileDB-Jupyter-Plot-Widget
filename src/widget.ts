@@ -114,8 +114,9 @@ class DagVisualizeView extends DOMWidgetView {
   getYScale(): number {
     const { nodes } = this.data as DataType;
     const numberOfNodes = nodes.length;
-
-    if (numberOfNodes < 30) {
+    if (numberOfNodes < 10) {
+      return .5 / (10 / numberOfNodes)
+    } else if (numberOfNodes < 30) {
       return .5 / (30 / numberOfNodes)
     } else if (numberOfNodes > 500) {
       return 2;
@@ -216,6 +217,10 @@ class DagVisualizeView extends DOMWidgetView {
     const biggestSide = Math.max(...bounds) - padding; // Remove padding
     const circleSize = Math.min((biggestSide / numberOfNodes), 30) * yScale;
 
+    console.log(biggestSide)
+    console.log(yScale);
+    console.log(circleSize);
+    
     const links = edges.map(([parent, child]) => ({
       source: parent,
       target: child,
