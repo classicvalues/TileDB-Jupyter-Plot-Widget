@@ -11,6 +11,7 @@ import {
 } from './version';
 import '../css/widget.css';
 import workerURL from 'file-loader!../lib/worker.js';
+import { poll } from './poll';
 
 type NodeType = {
   status: string;
@@ -31,6 +32,7 @@ interface DataType {
   positions: Positions;
 }
 
+// const BOX_ASPECT_RATIO = 0.36;
 export
 class DagVisualizeModel extends DOMWidgetModel {
   defaults() {
@@ -57,6 +59,8 @@ class DagVisualizeModel extends DOMWidgetModel {
   static view_module = MODULE_NAME;   // Set to null if no view
   static view_module_version = MODULE_VERSION;
 }
+
+const PADDING = 40;
 
 export
 class DagVisualizeView extends DOMWidgetView {
@@ -111,29 +115,20 @@ class DagVisualizeView extends DOMWidgetView {
     this.createTooltip();
   }
 
-  getYScale(): number {
-    const { nodes } = this.data as DataType;
-    const numberOfNodes = nodes.length;
-    if (numberOfNodes < 10) {
-      return .5 / (10 / numberOfNodes)
-    } else if (numberOfNodes < 30) {
-      return .5 / (30 / numberOfNodes)
-    } else if (numberOfNodes > 500) {
-      return 2;
-    }
+  getScale() {
+    const [maxWidth, height] = this.bounds as [number, number];
+    const scaleX = this.el.offsetWidth / (maxWidth + PADDING);
+    const scaleY = 400 / (height + PADDING);
 
-    return 1;
+    return [scaleX, scaleY];
   }
 
-
   zoom() {
-    if (this.initialized) {
-      return;
-    }
     const [width, height] = this.bounds as [number, number];
+    const [scaleX, scaleY] = this.getScale();
     const svg = this.svg;
-    const yScale = this.getYScale();
-    const zoom: any = d3.zoom().translateExtent([[0, 0], [width, height * yScale]]).on('zoom', () => {
+    
+    const zoom: any = d3.zoom().translateExtent([[0, 0], [width * scaleX + PADDING, height * scaleY + PADDING]]).on('zoom', () => {
       this.wrapper.attr('transform', d3.event.transform);
     });
 
@@ -198,28 +193,45 @@ class DagVisualizeView extends DOMWidgetView {
     return nodes.filter(hasNoParent);
   }
 
-  createDag() {
+  /**
+   * Calculate the size of the nodes in the graph depending on the number of nodes
+   * As the number of nodes in the tree gets bigger and bigger, the tree is becoming
+   * squeezed and the size of the nodes have to get smaller in order not to overlap
+   * witch each other.
+   * @param numberOfNodes Number of the nodes in the tree
+   */
+  getNodeSize(numberOfNodes: number):number {
+    const howManyTens = Math.floor(numberOfNodes / 10);
+
+    /**
+     * Don't let node size go bellow 5
+     */
+    return Math.max(320 / (20 + howManyTens), 5);
+  }
+
+  async createDag() {
     const { nodes, edges, node_details, positions } = this.data as DataType;
     const bounds = this.calculateBounds(positions);
+    const maxHeight = bounds[1];
+    /**
+     * During initialization the wrapper elemete (this.el) has no width,
+     * we wait for that before we do any DOM calculations.
+     */
+    if (!this.initialized) {
+      await poll(() => this.el.offsetWidth > 0, 300);
+    }
     const numberOfNodes = nodes.length;
     const lessThanThirtyNodes = numberOfNodes < 30;
-    const yScale = this.getYScale();
-    const maxHeight = bounds[1];
-    const padding = 30;
+    const [scaleX, scaleY] = this.getScale();
     /**
      * Sometimes during updates we are getting different/weird positions object
      * So we save and re-use the first positions object we are getting
      */
     this.positions = this.positions || positions;
-    this.svg.attr("viewBox", `0 0 ${bounds[0]} ${maxHeight * yScale + padding}`);
-    this.zoom();
-    
-    const biggestSide = Math.max(...bounds) - padding; // Remove padding
-    const circleSize = Math.min((biggestSide / numberOfNodes), 30) * yScale;
-
-    console.log(biggestSide)
-    console.log(yScale);
-    console.log(circleSize);
+    if (!this.initialized) {
+      this.zoom();
+    }
+    const circleSize = this.getNodeSize(numberOfNodes);
     
     const links = edges.map(([parent, child]) => ({
       source: parent,
@@ -230,8 +242,9 @@ class DagVisualizeView extends DOMWidgetView {
       index: i,
       status: node_details[node].status,
       id: node,
-      fx: (this.positions as Positions)[node][0],
-      fy: (maxHeight - (this.positions as Positions)[node][1] - circleSize) * yScale,
+      fx: (this.positions as Positions)[node][0] * scaleX,
+      /** For Y position we flip tree upside down (that's why: maxHeight - node's Y position) */
+      fy: (maxHeight - (this.positions as Positions)[node][1]) * scaleY,
     }));
 
     const worker = new Worker(workerURL);
