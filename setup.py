@@ -51,7 +51,8 @@ cmdclass = create_cmdclass(
     "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
 )
 cmdclass["jsdeps"] = combine_commands(
-    install_npm(HERE, build_cmd="build:all"), ensure_targets(jstargets),
+    install_npm(HERE, build_cmd="build:all"),
+    ensure_targets(jstargets),
 )
 
 packages = ["tiledb.plot.widget"] + [
@@ -95,7 +96,11 @@ setup_args = dict(
         "setuptools_scm>=1.5.4",
     ],
     extras_require={
-        "test": ["pytest>=3.6", "pytest-cov", "nbval",],
+        "test": [
+            "pytest>=3.6",
+            "pytest-cov",
+            "nbval",
+        ],
         "examples": [
             # Any requirements for the examples to run
         ],
