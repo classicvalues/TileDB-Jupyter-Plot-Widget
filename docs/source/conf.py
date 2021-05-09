@@ -57,7 +57,7 @@ master_doc = "index"
 # General information about the project.
 project = "tiledb-plot-widget"
 copyright = "2020, TileDB, Inc."
-author = "Konstantinos Sarantopoulos"
+author = "TileDB"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -146,7 +146,7 @@ latex_documents = [
         master_doc,
         "tiledb-plot-widget.tex",
         "tiledb-plot-widget Documentation",
-        "Konstantinos Sarantopoulos",
+        "TileDB",
         "manual",
     ),
 ]

@@ -1,5 +1,5 @@
-// Copyright (c) Konstantinos Sarantopoulos
-// Distributed under the terms of the Modified BSD License.
+// Copyright (c) TileDB
+// Distributed under the terms of the MIT License.
 import {
   IJupyterWidgetRegistry
  } from '@jupyter-widgets/base';
@@ -13,16 +13,16 @@ import {
 const EXTENSION_ID = 'tiledb-plot-widget:plugin';
 
 /**
- * The example plugin.
+ * The tiledbPlot plugin.
  */
-const examplePlugin = {
+const tiledbPlotPlugin = {
   id: EXTENSION_ID,
   requires: [IJupyterWidgetRegistry],
   activate: activateWidgetExtension,
   autoStart: true
 };
 
-export default examplePlugin;
+export default tiledbPlotPlugin;
 
 
 /**

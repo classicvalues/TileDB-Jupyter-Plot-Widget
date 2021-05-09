@@ -1,5 +1,5 @@
-// Copyright (c) Konstantinos Sarantopoulos
-// Distributed under the terms of the Modified BSD License.
+// Copyright (c) TileDB
+// Distributed under the terms of the MIT License.
 
 const data = require('../package.json');
 
