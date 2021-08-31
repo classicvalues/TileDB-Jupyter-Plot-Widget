@@ -144,8 +144,16 @@ stages:
         NPM_TOKEN: $(NPM_TOKEN)
 
     - script: |
-        echo $(./node_modules/.bin/git-tag-version)
+        currentVersion=$(./node_modules/.bin/git-tag-version)
+        echo $currentVersion
+        if [[ $currentVersion == *"beta"* ]];
+        then
+        echo "Publishing beta version";
+        yarn publish --new-version $(./node_modules/.bin/git-tag-version) --no-git-tag-version --access public --tag beta
+        else
+        echo "Publishing new version";
         yarn publish --new-version $(./node_modules/.bin/git-tag-version) --no-git-tag-version --access public
+        fi
       env:
         GITHUB_TOKEN: $(GITHUB_TOKEN)
         NPM_TOKEN: $(NPM_TOKEN)
