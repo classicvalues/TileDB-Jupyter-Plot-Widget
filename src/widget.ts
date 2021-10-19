@@ -85,7 +85,6 @@ export class DagVisualizeView extends DOMWidgetView {
 
   value_changed(): void {
     this.data = JSON.parse(this.model.get('value'));
-    console.log(this.data);
     /**
      * Reset html and build new graph
      */

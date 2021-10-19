@@ -7,7 +7,7 @@ include install.json
 include ts*.json
 include yarn.lock
 
-graft tiledb-plot-widget/labextension
+graft tiledb/plot/widget/labextension
 
 # Javascript files
 graft src
