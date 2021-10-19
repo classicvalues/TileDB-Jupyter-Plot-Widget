@@ -1,3 +1,4 @@
 declare module "file-loader!*" {
-    export default string;
+    const content: string;
+    export default content;
 }

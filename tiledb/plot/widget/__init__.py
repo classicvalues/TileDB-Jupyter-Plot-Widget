@@ -1,9 +1,18 @@
-#!/usr/bin/env python
-# coding: utf-8
 
-# Copyright (c) TileDB, Inc.
-# Distributed under the terms of the MIT License.
+import json
+from pathlib import Path
 
+from ._version import __version__
 from .visualize import Visualize
 
-from .nbextension import _jupyter_nbextension_paths
+HERE = Path(__file__).parent.resolve()
+
+with (HERE / "labextension" / "package.json").open() as fid:
+    data = json.load(fid)
+
+def _jupyter_labextension_paths():
+    return [{
+        "src": "labextension",
+        "dest": data["name"]
+    }]
+
