@@ -7,6 +7,7 @@ from pathlib import Path
 from ipywidgets import DOMWidget
 import json
 from traitlets import Unicode
+
 # from ._frontend import module_name, module_version
 
 
