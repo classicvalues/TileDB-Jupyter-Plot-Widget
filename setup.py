@@ -52,6 +52,10 @@ setup_args = dict(
     install_requires=[
         "ipywidgets>=7.0.0",
     ],
+    setup_requires=[
+        "setuptools-scm>=1.5.4",
+        "setuptools-scm-git-archive",
+    ],
     use_scm_version={
         "version_scheme": "guess-next-dev",
         "local_scheme": "dirty-tag",
