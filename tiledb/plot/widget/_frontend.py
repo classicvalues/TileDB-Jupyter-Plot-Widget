@@ -9,4 +9,4 @@ Information about the frontend package of the widgets.
 """
 
 module_name = "@tiledb-inc/tiledb-plot-widget"
-module_version = ">=0.1.10"
+module_version = ">=1.0.1"
