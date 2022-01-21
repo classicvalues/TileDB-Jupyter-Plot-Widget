@@ -1,6 +1,9 @@
-// Copyright (c) TileDB
-// Distributed under the terms of the MIT License.
+// Copyright (c) TileDB, Inc.
+// Distributed under the terms of the Modified BSD License.
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const data = require('../package.json');
 
 /**

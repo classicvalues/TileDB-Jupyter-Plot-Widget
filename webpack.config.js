@@ -19,27 +19,6 @@ const resolve = {
 
 module.exports = [
   /**
-   * Notebook extension
-   *
-   * This bundle only contains the part of the JavaScript that is run on load of
-   * the notebook.
-   */
-  {
-    entry: './src/extension.ts',
-    output: {
-      filename: 'index.js',
-      path: path.resolve(__dirname, 'tiledb/plot/widget', 'nbextension', 'static'),
-      libraryTarget: 'amd'
-    },
-    module: {
-      rules: rules
-    },
-    devtool: 'source-map',
-    externals,
-    resolve,
-  },
-
-  /**
    * Embeddable @tiledb-inc/tiledb-plot-widget bundle
    *
    * This bundle is almost identical to the notebook extension bundle. The only
@@ -62,28 +41,6 @@ module.exports = [
     module: {
         rules: rules
     },
-    externals,
-    resolve,
-  },
-
-
-  /**
-   * Documentation widget bundle
-   *
-   * This bundle is used to embed widgets in the package documentation.
-   */
-  {
-    entry: './src/index.ts',
-    output: {
-      filename: 'embed-bundle.js',
-      path: path.resolve(__dirname, 'docs', 'source', '_static'),
-      library: "@tiledb-inc/tiledb-plot-widget",
-      libraryTarget: 'amd'
-    },
-    module: {
-      rules: rules
-    },
-    devtool: 'source-map',
     externals,
     resolve,
   }
