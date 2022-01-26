@@ -261,14 +261,15 @@ export class DagVisualizeView extends DOMWidgetView {
       target: child
     }));
 
-    const nodeDetails = Object.keys(node_details).map(
-      (node: string, i: number) => ({
+    const nodeDetails = Object.entries(node_details).map(
+      ([nodeId, nodeData], i) => ({
         index: i,
-        status: node_details[node].status,
-        id: node,
-        fx: (this.positions as Positions)[node][0] * scaleX,
+        name: nodeData.name,
+        status: nodeData.status,
+        id: nodeId,
+        fx: (this.positions as Positions)[nodeId][0] * scaleX,
         /** For Y position we flip tree upside down (that's why: maxHeight - node's Y position) */
-        fy: (maxHeight - (this.positions as Positions)[node][1]) * scaleY
+        fy: (maxHeight - (this.positions as Positions)[nodeId][1]) * scaleY
       })
     );
 
@@ -317,9 +318,10 @@ export class DagVisualizeView extends DOMWidgetView {
             `${d.status} ${lessThanThirtyNodes ? 'node--small' : ''}`
         )
         .on('mouseover', (d: any) => {
+          const caption = d.name || d.id;
           this.tooltip.transition().duration(200).style('opacity', 0.9);
           this.tooltip
-            .html(`<p>${d.id}: ${d.status}</p>`)
+            .html(`<p>${caption}: ${d.status}</p>`)
             .style('left', `${d3.event.clientX + 10}px`)
             .style('top', `${d3.event.clientY + 10}px`);
         })
