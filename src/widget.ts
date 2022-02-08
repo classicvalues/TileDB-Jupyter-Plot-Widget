@@ -130,14 +130,14 @@ export class DagVisualizeView extends DOMWidgetView {
 
   zoom(): void {
     const [width, height] = this.bounds as [number, number];
-    const [scaleX, scaleY] = this.getScale();
+
     const svg = this.svg;
 
     const zoom: any = d3
       .zoom()
       .translateExtent([
         [0, 0],
-        [width * scaleX + PADDING, height * scaleY + PADDING]
+        [width + PADDING, height + PADDING]
       ])
       .on('zoom', () => {
         this.wrapper.attr('transform', d3.event.transform);
@@ -272,7 +272,7 @@ export class DagVisualizeView extends DOMWidgetView {
         id: nodeId,
         fx: (this.positions as Positions)[nodeId][0],
         /** For Y position we flip tree upside down (that's why: maxHeight - node's Y position) */
-        fy: MAX_HEIGHT - (this.positions as Positions)[nodeId][1]
+        fy: (this.positions as Positions)[nodeId][1]
       })
     );
 
