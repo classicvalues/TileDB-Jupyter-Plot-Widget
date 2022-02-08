@@ -234,8 +234,12 @@ export class DagVisualizeView extends DOMWidgetView {
 
   async createDag(): Promise<void> {
     const { nodes, edges, node_details, positions } = this.data as IDataType;
-    const bounds = this.calculateBounds(positions);
-    const maxHeight = bounds[1];
+    const [MAX_WIDTH, MAX_HEIGHT] = this.calculateBounds(positions);
+    const svg = d3.select(this.el).select('svg');
+
+    svg
+      .attr('preserveAspectRatio', 'xMinYMin meet')
+      .attr('viewBox', `0 0 ${MAX_WIDTH} ${MAX_HEIGHT}`);
     /**
      * During initialization the wrapper elemete (this.el) has no width,
      * we wait for that before we do any DOM calculations.
@@ -245,7 +249,7 @@ export class DagVisualizeView extends DOMWidgetView {
     }
     const numberOfNodes = nodes.length;
     const lessThanThirtyNodes = numberOfNodes < 30;
-    const [scaleX, scaleY] = this.getScale();
+    // const [scaleX, scaleY] = this.getScale();
     /**
      * Sometimes during updates we are getting different/weird positions object
      * So we save and re-use the first positions object we are getting
@@ -260,16 +264,15 @@ export class DagVisualizeView extends DOMWidgetView {
       source: parent,
       target: child
     }));
-
     const nodeDetails = Object.entries(node_details).map(
       ([nodeId, nodeData], i) => ({
         index: i,
         name: nodeData.name,
         status: nodeData.status,
         id: nodeId,
-        fx: (this.positions as Positions)[nodeId][0] * scaleX,
+        fx: (this.positions as Positions)[nodeId][0],
         /** For Y position we flip tree upside down (that's why: maxHeight - node's Y position) */
-        fy: (maxHeight - (this.positions as Positions)[nodeId][1]) * scaleY
+        fy: MAX_HEIGHT - (this.positions as Positions)[nodeId][1]
       })
     );
 
