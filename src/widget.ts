@@ -31,7 +31,6 @@ interface IDataType {
   positions: Positions;
 }
 
-// const BOX_ASPECT_RATIO = 0.36;
 export class DagVisualizeModel extends DOMWidgetModel {
   defaults(): any {
     return {
@@ -58,9 +57,6 @@ export class DagVisualizeModel extends DOMWidgetModel {
   static view_module = MODULE_NAME; // Set to null if no view
   static view_module_version = MODULE_VERSION;
 }
-
-const PADDING = 40;
-
 export class DagVisualizeView extends DOMWidgetView {
   data: IDataType | undefined;
   transform: any;
@@ -120,24 +116,22 @@ export class DagVisualizeView extends DOMWidgetView {
     this.createTooltip();
   }
 
-  getScale(): [number, number] {
-    const [maxWidth, height] = this.bounds as [number, number];
-    const scaleX = this.el.offsetWidth / (maxWidth + PADDING);
-    const scaleY = 400 / (height + PADDING);
+  // getScale(): [number, number] {
+  //   const [maxWidth, height] = this.bounds as [number, number];
+  //   const scaleX = this.el.offsetWidth / (maxWidth + PADDING);
+  //   const scaleY = 400 / (height + PADDING);
 
-    return [scaleX, scaleY];
-  }
+  //   return [scaleX, scaleY];
+  // }
 
-  zoom(): void {
-    const [width, height] = this.bounds as [number, number];
-
+  zoom(width: number, height: number): void {
     const svg = this.svg;
 
-    const zoom: any = d3
+    const zoom = d3
       .zoom()
       .translateExtent([
         [0, 0],
-        [width + PADDING, height + PADDING]
+        [width, height]
       ])
       .on('zoom', () => {
         this.wrapper.attr('transform', d3.event.transform);
@@ -224,22 +218,31 @@ export class DagVisualizeView extends DOMWidgetView {
    * @param numberOfNodes Number of the nodes in the tree
    */
   getNodeSize(numberOfNodes: number): number {
-    const howManyTens = Math.floor(numberOfNodes / 10);
-
+    // const howManyTens = Math.floor(numberOfNodes / 10);
+    return 12;
     /**
      * Don't let node size go bellow 5
      */
-    return Math.max(320 / (20 + howManyTens), 5);
+    // return Math.max(320 / (20 + howManyTens), 5);
+  }
+
+  getHeightScale(height: number, width: number): [number, number] {
+    const MAX_HEIGHT_RATIO = 0.65;
+    const maxHeight = Math.min(height, width * MAX_HEIGHT_RATIO);
+
+    return [maxHeight, maxHeight / height];
   }
 
   async createDag(): Promise<void> {
     const { nodes, edges, node_details, positions } = this.data as IDataType;
     const [MAX_WIDTH, MAX_HEIGHT] = this.calculateBounds(positions);
+    const [height, scaleY] = this.getHeightScale(MAX_HEIGHT, MAX_WIDTH);
+
     const svg = d3.select(this.el).select('svg');
 
     svg
       .attr('preserveAspectRatio', 'xMinYMin meet')
-      .attr('viewBox', `0 0 ${MAX_WIDTH} ${MAX_HEIGHT}`);
+      .attr('viewBox', `0 0 ${MAX_WIDTH} ${height}`);
     /**
      * During initialization the wrapper elemete (this.el) has no width,
      * we wait for that before we do any DOM calculations.
@@ -256,7 +259,7 @@ export class DagVisualizeView extends DOMWidgetView {
      */
     this.positions = this.positions || positions;
     if (!this.initialized) {
-      this.zoom();
+      this.zoom(MAX_WIDTH, height);
     }
     const circleSize = this.getNodeSize(numberOfNodes);
 
@@ -264,6 +267,7 @@ export class DagVisualizeView extends DOMWidgetView {
       source: parent,
       target: child
     }));
+
     const nodeDetails = Object.entries(node_details).map(
       ([nodeId, nodeData], i) => ({
         index: i,
@@ -272,7 +276,7 @@ export class DagVisualizeView extends DOMWidgetView {
         id: nodeId,
         fx: (this.positions as Positions)[nodeId][0],
         /** For Y position we flip tree upside down (that's why: maxHeight - node's Y position) */
-        fy: (this.positions as Positions)[nodeId][1]
+        fy: (this.positions as Positions)[nodeId][1] * scaleY
       })
     );
 
