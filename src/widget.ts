@@ -178,30 +178,30 @@ export class DagVisualizeView extends DOMWidgetView {
    * @param circleSize The size of the circle
    * @param fauxRootNode The name of the fake root node
    */
-  calculateYOffset(
-    descendants: d3.HierarchyPointNode<unknown>[],
-    circleSize: number,
-    fauxRootNode: string
-  ): number {
-    /**
-     * If we have already calculated the offset just return it.
-     * If not calculate the offset
-     */
-    if (typeof this.verticalOffset === 'undefined') {
-      const originalRoot = descendants.find((node: any) =>
-        Boolean(node.parent && node.parent.id === fauxRootNode)
-      );
-      /**
-       * Calculate the offset of the original root node,
-       * since the first faux root node that we added,
-       * we hide it and create an empty space to the top.
-       */
-      const yOffset = originalRoot ? originalRoot.y : 0;
-      this.verticalOffset = circleSize - yOffset / 2;
-    }
+  // calculateYOffset(
+  //   descendants: d3.HierarchyPointNode<unknown>[],
+  //   circleSize: number,
+  //   fauxRootNode: string
+  // ): number {
+  //   /**
+  //    * If we have already calculated the offset just return it.
+  //    * If not calculate the offset
+  //    */
+  //   if (typeof this.verticalOffset === 'undefined') {
+  //     const originalRoot = descendants.find((node: any) =>
+  //       Boolean(node.parent && node.parent.id === fauxRootNode)
+  //     );
+  //     /**
+  //      * Calculate the offset of the original root node,
+  //      * since the first faux root node that we added,
+  //      * we hide it and create an empty space to the top.
+  //      */
+  //     const yOffset = originalRoot ? originalRoot.y : 0;
+  //     this.verticalOffset = circleSize - yOffset / 2;
+  //   }
 
-    return this.verticalOffset;
-  }
+  //   return this.verticalOffset;
+  // }
 
   getRootNodes(nodes: IDataType['nodes'], edges: IDataType['edges']): string[] {
     const hasNoParent = (node: string) =>
@@ -227,7 +227,7 @@ export class DagVisualizeView extends DOMWidgetView {
   }
 
   getHeightScale(height: number, width: number): [number, number] {
-    const MAX_HEIGHT_RATIO = 0.65;
+    const MAX_HEIGHT_RATIO = 0.4;
     const maxHeight = Math.min(height, width * MAX_HEIGHT_RATIO);
 
     return [maxHeight, maxHeight / height];
