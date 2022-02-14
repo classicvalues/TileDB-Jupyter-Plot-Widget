@@ -1,12 +1,30 @@
 importScripts('https://d3js.org/d3-collection.v1.min.js');
-importScripts('https://d3js.org/d3-dispatch.v1.min.js');
-importScripts('https://d3js.org/d3-quadtree.v1.min.js');
-importScripts('https://d3js.org/d3-timer.v1.min.js');
-importScripts('https://d3js.org/d3-force.v1.min.js');
+importScripts('https://d3js.org/d3-dispatch.v3.min.js');
+importScripts('https://d3js.org/d3-quadtree.v3.min.js');
+importScripts('https://d3js.org/d3-timer.v3.min.js');
+importScripts('https://d3js.org/d3-force.v3.min.js');
 
-onmessage = function (event) {
-  const nodes = event.data.nodes;
-  const links = event.data.links;
+type Link = {
+  source: string;
+  target: string;
+};
+
+type NodeDetails = {
+  fx: number;
+  fy: number;
+  id: string;
+  index: number;
+  name: string;
+  status: string;
+};
+
+type MessageData = {
+  links: Link[];
+  nodes: NodeDetails[];
+};
+
+onmessage = function (event: MessageEvent<MessageData>) {
+  const { nodes, links } = event.data;
   const numberOfNodes = nodes.length;
   const width = 1300;
   const height = 500;
@@ -42,5 +60,5 @@ onmessage = function (event) {
     simulation.tick();
   }
 
-  postMessage({ type: 'end', nodes: nodes, links: links });
+  postMessage({ type: 'end', nodes, links });
 };

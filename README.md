@@ -1,6 +1,6 @@
 # tiledb-plot-widget
 
-[![Github Actions Status](https://github.com/TileDB-Inc/TileDB-Jupyter-Plot-Widget/workflows/Build/badge.svg)](https://github.com/TileDB-Inc/TileDB-Jupyter-Plot-Widget/actions/workflows/build.yml)
+[![Build Status](https://dev.azure.com/TileDB-Inc/CI/_apis/build/status/TileDB-Inc.TileDB-Jupyter-Plot-Widget?branchName=master)](https://dev.azure.com/TileDB-Inc/CI/_build/latest?definitionId=18&branchName=master)
 
 Custom Jupyterlab widget for TileDB
 

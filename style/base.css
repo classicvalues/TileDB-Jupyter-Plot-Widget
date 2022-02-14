@@ -29,8 +29,7 @@
     --jp-image-zoomout: url('../icons/zoomout.svg');
     --jp-image-zoomreset: url('../icons/zoomreset.svg');
   
-    height: 440px;
-    padding: 20px 0;
+    padding: 30px 0 10px;
     position: relative;
     width: 100%;
   }
@@ -115,6 +114,7 @@
     position: absolute;
     top: 0;
     z-index: 1;
+    cursor: pointer;
     background-color: var(--kashmir);
     background-image: var(--jp-image-zoomin);
     border: 0;
