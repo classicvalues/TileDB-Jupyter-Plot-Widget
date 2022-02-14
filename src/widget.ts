@@ -151,14 +151,14 @@ export class DagVisualizeView extends DOMWidgetView {
         [0, 0],
         [width, height]
       ])
-      .on('zoom', () => {
-        this.wrapper.attr('transform', d3.event.transform);
+      .on('zoom', (zoomEvent: any) => {
+        this.wrapper.attr('transform', zoomEvent.transform);
       });
 
     svg.call(zoom).on('wheel.zoom', null);
 
     function zoomHandler(this: any) {
-      d3.event.preventDefault();
+      d3.event?.preventDefault();
       const direction = this.id === 'zoom_in' ? 0.2 : -0.2;
       /**
        * In SVG 1.1 <svg> elements did not support transform attributes. In SVG 2 it is proposed that they should.
@@ -260,7 +260,7 @@ export class DagVisualizeView extends DOMWidgetView {
           status: nodeData.status,
           id: nodeId,
           fx: fx + circleSize / 2,
-          fy: fy * scaleY
+          fy: (MAX_HEIGHT - fy) * scaleY
         };
       }
     );
@@ -310,13 +310,14 @@ export class DagVisualizeView extends DOMWidgetView {
           (d: NodeDetails) =>
             `${d.status} ${lessThanThirtyNodes ? 'node--small' : ''}`
         )
-        .on('mouseover', (d: NodeDetails) => {
+        .on('mouseover', (event: any, d: NodeDetails) => {
           const caption = d.name || d.id;
+
           this.tooltip.transition().duration(200).style('opacity', 0.9);
           this.tooltip
             .html(`<p>${caption}: ${d.status}</p>`)
-            .style('left', `${d3.event.clientX + 10}px`)
-            .style('top', `${d3.event.clientY + 10}px`);
+            .style('left', `${event.clientX + 10}px`)
+            .style('top', `${event.clientY + 10}px`);
         })
         .on('mouseout', () => {
           this.tooltip.transition().duration(500).style('opacity', 0);
