@@ -11,6 +11,7 @@ import debounce from './debounce';
 import workerURL from 'file-loader!../lib/worker.js';
 import { MODULE_NAME, MODULE_VERSION } from './version';
 import { poll } from './poll';
+import clamp from './clamp';
 
 type NodeType = {
   status: string;
@@ -55,7 +56,8 @@ interface IDataType {
   positions: Positions;
 }
 
-const NODE_SIZE = 14;
+const NODE_SIZE = 15;
+// const PADDING = 20;
 
 export class DagVisualizeModel extends DOMWidgetModel {
   defaults(): any {
@@ -115,12 +117,8 @@ export class DagVisualizeView extends DOMWidgetView {
 
   calculateBounds(positions: Positions): [number, number] {
     if (typeof this.bounds === 'undefined') {
-      const xNums = Object.keys(positions).map(
-        (pos: keyof Positions) => positions[pos][0]
-      );
-      const yNums = Object.keys(positions).map(
-        (pos: keyof Positions) => positions[pos][1]
-      );
+      const xNums = Object.values(positions).map(pos => pos[0]);
+      const yNums = Object.values(positions).map(pos => pos[1]);
       const padding = 30;
       const verticalPadding = 60;
       const maxHorizontalCoordinate = Math.max(...xNums);
@@ -203,17 +201,20 @@ export class DagVisualizeView extends DOMWidgetView {
    * @param scaleY How much the visualization has been scaled down vertically
    */
   getNodeSize(scaleY: number): number {
-    return NODE_SIZE * Math.min(1, scaleY * 1.4);
+    return NODE_SIZE * scaleY * 0.8;
   }
 
   /**
    * We squeeze vertically the visualization in case it is too tall
    */
   getHeightScale(height: number, width: number): [number, number] {
-    const MAX_HEIGHT_RATIO = 0.5;
-    const maxHeight = Math.min(height, width * MAX_HEIGHT_RATIO);
+    const MAX_HEIGHT_RATIO = 0.7;
+    const MIN_HEIGHT_RATIO = 0.3;
+    const upperBound = width * MAX_HEIGHT_RATIO;
+    const lowerBound = width * MIN_HEIGHT_RATIO;
+    const clampedHeight = clamp(lowerBound, upperBound, height);
 
-    return [maxHeight, maxHeight / height];
+    return [clampedHeight, clampedHeight / height];
   }
 
   async createDag(): Promise<void> {
@@ -221,10 +222,12 @@ export class DagVisualizeView extends DOMWidgetView {
     const [MAX_WIDTH, MAX_HEIGHT] = this.calculateBounds(positions);
     const [height, scaleY] = this.getHeightScale(MAX_HEIGHT, MAX_WIDTH);
     const svg = d3.select(this.el).select('svg');
+    const circleSize = this.getNodeSize(scaleY);
+    const viewBoxWidth = MAX_WIDTH + circleSize;
 
     svg
       .attr('preserveAspectRatio', 'xMinYMin meet')
-      .attr('viewBox', `0 0 ${MAX_WIDTH} ${height}`);
+      .attr('viewBox', `0 0 ${viewBoxWidth} ${height}`);
     /**
      * During initialization the wrapper elemete (this.el) has no width,
      * we wait for that before we do any DOM calculations.
@@ -248,7 +251,7 @@ export class DagVisualizeView extends DOMWidgetView {
       source: parent,
       target: child
     }));
-    const circleSize = this.getNodeSize(scaleY);
+
     const nodeDetails = Object.entries(node_details).map(
       ([nodeId, nodeData], i) => {
         const nodePosition = (this.positions as Positions)[nodeId];
