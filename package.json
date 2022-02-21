@@ -1,6 +1,6 @@
 {
   "name": "@tiledb-inc/tiledb-plot-widget",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Custom Jupyterlab widget for TileDB",
   "keywords": [
     "jupyter",
@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "author": {
-    "name": "tiledb",
+    "name": "TileDB",
     "email": "hello@tiledb.com"
   },
   "files": [
