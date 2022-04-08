@@ -224,10 +224,18 @@ export class DagVisualizeView extends DOMWidgetView {
     const svg = d3.select(this.el).select('svg');
     const circleSize = this.getNodeSize(scaleY);
     const viewBoxWidth = MAX_WIDTH + circleSize;
+    /**
+     * In case plot is really big the edges betweend nodes are faint, make them bolder
+     */
+    const pathsShouldBeBolder = viewBoxWidth > 5000;
 
     svg
       .attr('preserveAspectRatio', 'xMinYMin meet')
       .attr('viewBox', `0 0 ${viewBoxWidth} ${height}`);
+
+    if (pathsShouldBeBolder) {
+      svg.attr('class', 'tiledb-plot--bolder');
+    }
     /**
      * During initialization the wrapper elemete (this.el) has no width,
      * we wait for that before we do any DOM calculations.
@@ -318,7 +326,9 @@ export class DagVisualizeView extends DOMWidgetView {
 
           this.tooltip.transition().duration(200).style('opacity', 0.9);
           this.tooltip
-            .html(`<p>${caption}: ${d.status}</p>`)
+            .html(
+              `<p class="tiledb-plot-tooltip">${caption}: <b>${d.status}</b></p>`
+            )
             .style('left', `${event.clientX + 10}px`)
             .style('top', `${event.clientY + 10}px`);
         })

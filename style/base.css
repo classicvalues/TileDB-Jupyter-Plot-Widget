@@ -53,6 +53,10 @@
     fill: none;
     stroke:#999;
   }
+
+  .tiledb-plot--bolder path {
+    stroke-width: 5px;
+  }
   
   .tiledb-widget text {
     fill: #fff;
@@ -81,6 +85,15 @@
     animation-iteration-count: infinite;
     stroke-dasharray: 10;
     stroke-dashoffset: 100;
+  }
+
+  .tiledb-plot-tooltip {
+    word-break: break-all;
+  }
+
+  .tiledb-plot-tooltip b {
+    display: block;
+    margin-top: 5px;
   }
   
   .tiledb-widget .Completed {
