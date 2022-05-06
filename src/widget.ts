@@ -286,55 +286,67 @@ export class DagVisualizeView extends DOMWidgetView {
         return;
       }
 
-      /**
-       * Remove previous contents
-       */
-      this.wrapper.selectAll('*').remove();
       const { nodes, links } = event.data;
 
-      this.wrapper
-        .append('g')
-        .selectAll('path')
-        .data(links)
-        .enter()
-        .append('path')
-        .attr('d', (d: Link) => {
-          return `M${d.source.x},${d.source.y} C ${d.source.x},${
-            (d.source.y + d.target.y) / 2
-          } ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${
-            d.target.y
-          }`;
-        })
-        .attr('class', (d: Link) => `path-${d.target.status}`);
+      const lines = this.wrapper.selectAll('path').data(links);
 
-      this.wrapper
-        .append('g')
-        .selectAll('circle')
-        .data(nodes)
-        .enter()
-        .append('circle')
-        .attr('cx', (d: NodeDetails) => d.x)
-        .attr('cy', (d: NodeDetails) => d.y)
-        .attr('r', circleSize)
-        .attr(
-          'class',
-          (d: NodeDetails) =>
-            `${d.status} ${lessThanThirtyNodes ? 'node--small' : ''}`
-        )
-        .on('mouseover', (event: any, d: NodeDetails) => {
-          const caption = d.name || d.id;
+      lines.join(
+        (enter: any) => {
+          enter
+            .append('path')
+            .attr('d', (d: Link) => {
+              return `M${d.source.x},${d.source.y} C ${d.source.x},${
+                (d.source.y + d.target.y) / 2
+              } ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${
+                d.target.y
+              }`;
+            })
+            .attr('class', (d: Link) => `path-${d.target.status}`);
+        },
+        (update: any) =>
+          update.attr('class', (d: Link) => `path-${d.target.status}`)
+      );
 
-          this.tooltip.transition().duration(200).style('opacity', 0.9);
-          this.tooltip
-            .html(
-              `<p class="tiledb-plot-tooltip">${caption}: <b>${d.status}</b></p>`
+      const circles = this.wrapper.selectAll('circle').data(nodes);
+
+      circles.join(
+        (enter: any) => {
+          enter
+            .append('circle')
+            .attr('cx', (d: NodeDetails) => d.x)
+            .attr('cy', (d: NodeDetails) => d.y)
+            .attr('r', circleSize)
+            .attr(
+              'class',
+              (d: NodeDetails) =>
+                `${d.status} ${lessThanThirtyNodes ? 'node--small' : ''}`
             )
-            .style('left', `${event.clientX + 10}px`)
-            .style('top', `${event.clientY + 10}px`);
-        })
-        .on('mouseout', () => {
-          this.tooltip.transition().duration(500).style('opacity', 0);
-        });
+            .on('mouseover', (event: any, d: NodeDetails) => {
+              const caption = d.name || d.id;
+
+              this.tooltip.transition().duration(200).style('opacity', 0.9);
+              this.tooltip
+                .html(
+                  `<p class="tiledb-plot-tooltip">${caption}: <b>${d.status}</b></p>`
+                )
+                .style('left', `${event.clientX + 10}px`)
+                .style('top', `${event.clientY + 10}px`);
+            })
+            .on('mouseout', () => {
+              this.tooltip.transition().duration(500).style('opacity', 0);
+            });
+        },
+        (update: any) => {
+          update.attr(
+            'class',
+            (d: NodeDetails) =>
+              `${d.status} ${lessThanThirtyNodes ? 'node--small' : ''}`
+          );
+        },
+        (exit: any) => {
+          exit.on('mouseover', null).on('mouseout', null).remove();
+        }
+      );
     };
   }
 
